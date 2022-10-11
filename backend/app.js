@@ -28,10 +28,14 @@ if (process.env.NODE_ENV !== "PRODUCTION") {
 }
 
 //all routes here
+//for user
 app.use("/user", require("./Routes/userRouter"));
-// app.use('/api',     'api')
+// for ads
 app.use("/adCard", require("./Routes/adcardRouter"));
+// for chats
 app.use("/api/chat", require("./Routes/chatRouter"));
+// for messages
+app.use("/api/message", require("./Routes/messageRouter"));
 
 app.get("/", (req, res, next) => {
   res.send("hello this is the landing page");
