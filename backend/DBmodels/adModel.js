@@ -39,6 +39,10 @@ const adSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
+  course: {
+    type: String,
+    require: [true, "Please fill in course detail"],
+  },
   address: {
     city: {
       type: String,

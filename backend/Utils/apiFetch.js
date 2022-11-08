@@ -23,12 +23,17 @@ class ApiFetchure {
 
     //search by Category
     if (category) {
-      this.ads = this.ads.find({ Category: category });
+      if (category == "All") {
+        this.ads = this.ads.find();
+      } else {
+        this.ads = this.ads.find({ Category: category });
+      }
     }
 
     // search by state
     if (state) {
-      this.ads = this.ads.find({ ...state });
+      let address = { state };
+      this.ads = this.ads.find({ address });
     }
     console.log("hello-mello");
     return this;
