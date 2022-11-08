@@ -17,8 +17,8 @@ function LoginPage() {
     return (
         <>
             <MetaData title={"Login"} />
-            <div className=' Login'>
-                <Container maxW="xl" centerContent>
+            <div className='bg-gray-600'>
+                <Container maxW="2xl" centerContent>
                     <Box
                         d="flex"
                         justifyContent="center"
