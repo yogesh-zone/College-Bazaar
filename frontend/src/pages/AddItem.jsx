@@ -1,23 +1,21 @@
 import { Avatar, Box, Button, Container, Divider, FormControl, FormLabel, Input, Select, Text, Textarea, VStack } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { ButtonGhost, MetaData } from '../components/Utility'
 import ItemsLoading from '../Loading/ItemsLoading';
 
 function AddItem() {
-    console.log("before effect");
     const [name, setName] = useState("");
     const [category, setCategory] = useState("");
     const [Course, setCourse] = useState("");
     const [Semester, setSemester] = useState("");
     const [sem, setSem] = useState(0);
-    const [queryLoading, setQueryLoading] = useState(false);
+    const [buttonLoading, setButtonLoading] = useState(false);
 
     const [file, setFile] = useState(null);
-    const [fileDataURL, setFileDataURL] = useState(null);
+    const [files, setFiles] = useState([]);
     const [allImg, setAllImg] = useState([]);
-    // const [count, setCount] = useState(0);
-    // let allItem = ["", "", "", "", "", ""];
     const imageMimeType = /image\/(png|jpg|jpeg)/i;
 
     const fileUpload = useRef(null);
@@ -31,25 +29,25 @@ function AddItem() {
         }
         setFile(file);
     }
+    const removeImg = () => {
+        if (files.length) {
+            setAllImg(allImg.filter((i) => (i !== allImg[allImg.length - 1])));
+            setFiles(files.filter((i) => (i !== files[files.length])));
+        }
+    }
     useEffect(() => {
-        console.log("under effect");
         let fileReader, isCancel = false;
         if (file) {
             fileReader = new FileReader();
             fileReader.onload = (e) => {
                 const { result } = e.target;
                 if (result && !isCancel) {
-                    setFileDataURL(result);
-                    allImg.push(result);
-                    // setAllImg(allImg, result);
+                    setAllImg(allImg.concat(result));
+                    setFiles(files.concat(file));
                 }
             }
             fileReader.readAsDataURL(file);
         }
-        // if (fileDataURL) {
-        //     allImg.push(fileDataURL);
-        //     setFileDataURL(null);
-        // }
         return () => {
             isCancel = true;
             if (fileReader && fileReader.readyState === 1) {
@@ -57,9 +55,7 @@ function AddItem() {
             }
         }
 
-    }, [file, allImg, setAllImg]);
-    console.log("after effect");
-
+    }, [file]);
     const handleCourse = (e) => {
         setCourse(e.target.value);
         courseSem(e.target.value);
@@ -80,13 +76,14 @@ function AddItem() {
         }
     }
     const handleUpload = () => {
-        fileUpload.current.click()
+        fileUpload.current.click();
     }
-    const removeImg = () => {
-        console.log("data is ", allImg);
-        const temp = allImg;
-        temp.pop();
-        setAllImg(temp);
+    const handleSubmit = (e) => {
+        setButtonLoading(true);
+        setTimeout(() => {
+            setButtonLoading(false);
+        }, 2000)
+        console.log("handle submit", e);
     }
 
     const TextH1 = ({ heading }) => {
@@ -98,9 +95,6 @@ function AddItem() {
     return (
         <>
             <MetaData title={"Add Item"} />
-            {allImg.map((img, idx) => (
-                <img src={img} alt="preview" className='h-[50px] w-[50px] overflow-hidden' />
-            ))}
             <div className="bg-gray-600 h-auto overflow-auto">
                 <Container maxW="4xl" centerContent>
                     <Box
@@ -134,7 +128,7 @@ function AddItem() {
                             mb={1}
                         >
                             <TextH2 heading={"INCLUDE SOME DETAILS"} />
-                            <VStack spacing="10px">
+                            <VStack spacing="10px" onSubmit={handleSubmit}>
                                 <FormControl id="name" isRequired>
                                     <FormLabel>Title</FormLabel>
                                     <Input
@@ -237,10 +231,11 @@ function AddItem() {
                                         {allImg[i] ? <img src={allImg[i]} className="h-[100%] w-[100%]" /> : <svg width="36px" height="36px" viewBox="0 0 1024 1024" data-aut-id="icon" class fill-rule="evenodd">
                                             <path d="M841.099 667.008v78.080h77.568v77.653h-77.568v77.141h-77.568v-77.184h-77.611v-77.611h77.611v-78.080h77.568zM617.515 124.16l38.784 116.437h165.973l38.827 38.827v271.659l-38.827 38.357-38.741-38.4v-232.832h-183.125l-38.784-116.48h-176.853l-38.784 116.48h-183.083v426.923h426.667l38.784 38.357-38.784 39.253h-465.493l-38.741-38.869v-504.491l38.784-38.827h165.973l38.827-116.437h288.597zM473.216 318.208c106.837 0 193.92 86.955 193.92 194.048 0 106.923-87.040 194.091-193.92 194.091s-193.963-87.168-193.963-194.091c0-107.093 87.083-194.048 193.963-194.048zM473.216 395.861c-64.213 0-116.352 52.181-116.352 116.395 0 64.256 52.139 116.437 116.352 116.437 64.171 0 116.352-52.181 116.352-116.437 0-64.213-52.181-116.437-116.352-116.437z"></path>
                                         </svg>}
+                                        {console.log(i, allImg[i])}
                                     </button>
                                 ))}
                             </div>
-                            <button className={`mx-1 w-[auto] bg-blue-400 hover:text-blue-400 border-blue-400  active:text-blue-600 space-x-3 font-semibold px-5  p-2 border-2 hover:bg-transparent rounded-md text-white capitalize`} onClick={removeImg}>Reset </button>
+                            <button className={`mx-1 w-[auto] bg-blue-400 hover:text-blue-400 border-blue-400  active:text-blue-600 space-x-3 font-semibold px-5  p-2 border-2 hover:bg-transparent rounded-md text-white capitalize`} onClick={removeImg}>Remove Image</button>
                             <img src={"https://blog.logrocket.com/wp-content/uploads/2022/09/logrocket-logo-frontend-analytics.png"} alt="preview" />
                             {/* </FormControl> */}
                         </Box>
@@ -273,11 +268,8 @@ function AddItem() {
                             </FormControl>
                         </Box>
                         <Divider />
-                        <div className='p-2 flex'>
-                            <a
-                                href="/to"
-                                className={`mx-auto w-[auto] bg-blue-400 hover:text-blue-400 border-blue-400  active:text-blue-600 space-x-3 font-semibold px-5  p-2 border-2 hover:bg-transparent rounded-md text-white capitalize`}
-                            >Post Now</a>
+                        <div className='p-2 flex flex-col'>
+                            <Button variant="solid" colorScheme="green" isLoading={buttonLoading} onClick={handleSubmit} loadingText="It may take few seconds">Post Now</Button>
                         </div>
                     </Box>
                 </Container>
