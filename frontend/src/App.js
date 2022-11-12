@@ -1,23 +1,29 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import Navbar from "./Layouts/Navbar";
+import { Routes, Route } from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import Home from "./pages/Home";
+import DefaultLoading from "./Loading/DefaultLoading";
+import animationData from "./Animations/404.json";
+import AddItem from "./pages/AddItem";
+import Footer from "./Layouts/Footer";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="h-screen overflow-auto justify-between flex flex-col">
+      <div>
+        <Navbar />
+        <Routes>
+          <Route exact path="/" element={<Home />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/addItem" element={<AddItem />} />
+          <Route
+            path="*"
+            element={<DefaultLoading animationData={animationData} />}
+          />
+        </Routes>
+      </div>
+      <Footer />
     </div>
   );
 }

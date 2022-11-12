@@ -1,5 +1,7 @@
 const Ad = require("../DBmodels/adModel");
 const cloudinary = require("cloudinary");
+const ApiFetchure = require("../Utils/apiFetch");
+
 const adCtrl = {
   newAd: async (req, res) => {
     try {
@@ -36,12 +38,22 @@ const adCtrl = {
 
   allAds: async (req, res) => {
     try {
-      const ads = await Ad.find().populate("user", "name avatar");
-      res.json({ ads });
-    } catch (err) {
-      return res.status(500).json({ msg: err.message });
+      let ads = Ad.find().populate("user", "name avatar");
+      const result = new ApiFetchure(ads, req.query).search().pagination(2);
+      ads = await result.ads;
+      return res.json({ msg: ads });
+    } catch (error) {
+      return res.status(500).json({ msg: error.message });
     }
   },
+  // allAds: async (req, res) => {
+  //   try {
+  //     const ads = await Ad.find().populate("user", "name avatar");
+  //     res.json({ ads });
+  //   } catch (err) {
+  //     return res.status(500).json({ msg: err.message });
+  //   }
+  // },
 
   aAd: async (req, res) => {
     try {
