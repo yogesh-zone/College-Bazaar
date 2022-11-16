@@ -21,6 +21,7 @@ const messageCtrl = {
     }
   },
 
+  //send msg b/w two users
   sendMessage: async (req, res) => {
     try {
       const { content, chatId } = req.body;
