@@ -5,7 +5,8 @@ const authAdmin = require("../Middleware/authAdmin");
 const upload = require("../Middleware/uploadImage");
 const router = express.Router();
 
-router.post("/new", auth, upload, adCtrl.newAd);
+router.post("/new", auth, adCtrl.newAd);
+// router.post("/new", auth, upload, adCtrl.newAd);
 
 router.delete("/delete/:_id", auth, adCtrl.deleteAd);
 

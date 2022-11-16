@@ -1,49 +1,62 @@
-import { Avatar, Box, Button, Container, Divider, FormControl, FormLabel, Input, Select, Text, Textarea, VStack } from '@chakra-ui/react'
+import { Avatar, Box, Button, Container, Divider, Fade, FormControl, FormLabel, Input, Select, Text, Textarea, useToast, VStack } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ButtonGhost, MetaData } from '../components/Utility'
-import ItemsLoading from '../Loading/ItemsLoading';
-
+import ItemsLoading from '../components/Loading/ItemsLoading';
+import axios from "axios"
 function AddItem() {
-    const [name, setName] = useState("");
-    const [category, setCategory] = useState("");
-    const [Course, setCourse] = useState("");
-    const [Semester, setSemester] = useState("");
+    const [formData, setFormData] = useState({});
     const [sem, setSem] = useState(0);
-    const [buttonLoading, setButtonLoading] = useState(false);
-
+    const [Course, setCourse] = useState("");
     const [file, setFile] = useState(null);
-    const [files, setFiles] = useState([]);
     const [allImg, setAllImg] = useState([]);
     const imageMimeType = /image\/(png|jpg|jpeg)/i;
-
+    const toast = useToast();
+    const [buttonLoading, setButtonLoading] = useState(false);
     const fileUpload = useRef(null);
-
-    const totalImg = [0, 1, 2, 3, 4, 5];
     const handleChange = (e) => {
         const file = e.target.files[0];
         if (!file.type.match(imageMimeType)) {
-            alert("Image mime type is not valid");
+            toast({
+                title: "Image mime type is not valid",
+                status: "warning",
+                duration: 3000,
+                isClosable: true,
+                position: "bottom",
+            });
             return;
         }
         setFile(file);
     }
+    const handleFormData = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    }
     const removeImg = () => {
-        if (files.length) {
-            setAllImg(allImg.filter((i) => (i !== allImg[allImg.length - 1])));
-            setFiles(files.filter((i) => (i !== files[files.length])));
-        }
+        // if (allImg.length) {
+        setAllImg(allImg.filter((i) => (i !== allImg[allImg.length - 1])));
+        setFormData({ ...formData, allImg });
+        // }
     }
     useEffect(() => {
         let fileReader, isCancel = false;
         if (file) {
+            if (file.size > 2000000) {
+                toast({
+                    title: "Image size sould not exceed 2MB.",
+                    status: "warning",
+                    duration: 3000,
+                    isClosable: true,
+                    position: "bottom",
+                });
+                return;
+            }
             fileReader = new FileReader();
             fileReader.onload = (e) => {
                 const { result } = e.target;
                 if (result && !isCancel) {
-                    setAllImg(allImg.concat(result));
-                    setFiles(files.concat(file));
+                    setAllImg([...allImg, result]);
+                    setFormData({ ...formData, ["allImg"]: [...allImg, result] });
                 }
             }
             fileReader.readAsDataURL(file);
@@ -78,12 +91,46 @@ function AddItem() {
     const handleUpload = () => {
         fileUpload.current.click();
     }
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         setButtonLoading(true);
-        setTimeout(() => {
+        if (!formData || !formData.name || !formData.description || !formData.course || !formData.semester || !formData.price || !formData.city || !formData.state) {
+            toast({
+                title: "Please Fill all the Feilds",
+                status: "warning",
+                duration: 3000,
+                isClosable: true,
+                position: "bottom",
+            });
             setButtonLoading(false);
-        }, 2000)
-        console.log("handle submit", e);
+            return;
+        }
+        if (!formData.allImg) {
+            toast({
+                title: "Please upload atleast 2 photos",
+                status: "warning",
+                duration: 3000,
+                isClosable: true,
+                position: "bottom",
+            });
+            setButtonLoading(false);
+            return;
+        }
+        console.log(formData);
+        setButtonLoading(false);
+        return;
+        try {
+            const config = {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            };
+            const { data } = await axios.post('/api/adCard/new', { name: "yogsh", allImg }, config);
+            console.log("data is ", data);
+        } catch (error) {
+            console.log('error occured!')
+        }
+        console.log("handle submit end!!");
+        setButtonLoading(false);
     }
 
     const TextH1 = ({ heading }) => {
@@ -128,27 +175,30 @@ function AddItem() {
                             mb={1}
                         >
                             <TextH2 heading={"INCLUDE SOME DETAILS"} />
-                            <VStack spacing="10px" onSubmit={handleSubmit}>
+                            <VStack spacing="10px">
                                 <FormControl id="name" isRequired>
                                     <FormLabel>Title</FormLabel>
                                     <Input
+                                        name="name"
                                         type="text"
+                                        value={formData && formData.name}
+                                        onChange={handleFormData}
                                     />
                                     <Text fontSize="xs" className='font-thin'>Mention the key features of your item (e.g. book name, brand, type)  </Text>
                                 </FormControl>
                                 <FormControl id="description" isRequired>
                                     <FormLabel>Description</FormLabel>
                                     <Textarea
-                                    // value={password}
-                                    // onChange={(e) => setPassword(e.target.value)}
-                                    // type={show ? "text" : "password"}
-                                    // placeholder="Enter password"
+                                        name="description"
+                                        value={formData && formData.description}
+                                        onChange={handleFormData}
                                     />
                                     <Text fontSize="xs" className='font-thin'>Include condition, features and reason for selling</Text>
                                 </FormControl>
                                 <FormControl id="category">
                                     <FormLabel>Category</FormLabel>
-                                    <Select placeholder='  ' Selected>
+                                    <Select name="category" placeholder='  ' Selected value={formData && formData.category}
+                                        onChange={handleFormData}>
                                         <option value="Akash">Akash</option>
                                         <option value="Books">Book</option>
                                         <option value="ED">Engineering Drawing</option>
@@ -171,7 +221,8 @@ function AddItem() {
                             <VStack spacing="10px">
                                 <FormControl id="course" isRequired onChange={handleCourse}>
                                     <FormLabel>Course</FormLabel>
-                                    <Select placeholder='  ' Selected>
+                                    <Select name="course" placeholder='  ' Selected value={formData && formData.course}
+                                        onChange={handleFormData}>
                                         <option value="B.Tech" >B.Tech</option>
                                         <option value="BBA">BBA</option>
                                         <option value="MBA">MBA</option>
@@ -179,7 +230,8 @@ function AddItem() {
                                 </FormControl>
                                 <FormControl id="semester" isRequired onChange={handleCourse}>
                                     <FormLabel>Semester</FormLabel>
-                                    <Select placeholder='  ' Selected>
+                                    <Select name="semester" placeholder='  ' Selected value={formData && formData.semester}
+                                        onChange={handleFormData}>
                                         <option value="first" className={sem >= 1 ? "flex m-3" : "hidden"}>I</option>
                                         <option value="second" className={sem >= 2 ? "flex m-3" : "hidden"}>II</option>
                                         <option value="third" className={sem >= 3 ? "flex m-3" : "hidden"}>III</option>
@@ -206,9 +258,10 @@ function AddItem() {
                             <FormControl id="price" isRequired>
                                 <FormLabel>Price</FormLabel>
                                 <Input
-                                    // value={email}
+                                    name="price"
                                     type="number"
-                                // onChange={(e) => setEmail(e.target.value)}
+                                    value={formData && formData.price}
+                                    onChange={handleFormData}
                                 />
                             </FormControl>
                         </Box>
@@ -222,22 +275,17 @@ function AddItem() {
                             w="100%"
                             mb={1}>
                             <TextH2 heading={"UPLOAD UP TO 6 PHOTOS"} />
-                            {/* <FormControl id="upload" isRequired> */}
-                            {/* <FormLabel>Title</FormLabel> */}
                             <div className='flex flex-wrap space-x-2 p-2 space-y-1'>
                                 <Input className='hidden' type="file" id="fileInput" accept='image/*' name="fileInput" ref={fileUpload} onChange={handleChange} />
-                                {totalImg.map((i) => (
-                                    <button type="button" key={i} onClick={allImg[i] ? "" : handleUpload} className={`border-2 ${allImg[i] ? "opacity-100" : "opacity-40"} focus:opacity-100 border-gray-600 h-24 w-24 flex justify-center items-center `}>
+                                {Array(6).fill(' ').map((_, i) => (
+                                    <button type="button" key={i} onClick={!allImg[i] && handleUpload} className={`border-2 ${allImg[i] ? "opacity-100" : "opacity-40"} focus:opacity-100 border-gray-600 h-24 w-24 flex justify-center items-center `}>
                                         {allImg[i] ? <img src={allImg[i]} className="h-[100%] w-[100%]" /> : <svg width="36px" height="36px" viewBox="0 0 1024 1024" data-aut-id="icon" class fill-rule="evenodd">
                                             <path d="M841.099 667.008v78.080h77.568v77.653h-77.568v77.141h-77.568v-77.184h-77.611v-77.611h77.611v-78.080h77.568zM617.515 124.16l38.784 116.437h165.973l38.827 38.827v271.659l-38.827 38.357-38.741-38.4v-232.832h-183.125l-38.784-116.48h-176.853l-38.784 116.48h-183.083v426.923h426.667l38.784 38.357-38.784 39.253h-465.493l-38.741-38.869v-504.491l38.784-38.827h165.973l38.827-116.437h288.597zM473.216 318.208c106.837 0 193.92 86.955 193.92 194.048 0 106.923-87.040 194.091-193.92 194.091s-193.963-87.168-193.963-194.091c0-107.093 87.083-194.048 193.963-194.048zM473.216 395.861c-64.213 0-116.352 52.181-116.352 116.395 0 64.256 52.139 116.437 116.352 116.437 64.171 0 116.352-52.181 116.352-116.437 0-64.213-52.181-116.437-116.352-116.437z"></path>
                                         </svg>}
-                                        {console.log(i, allImg[i])}
                                     </button>
                                 ))}
                             </div>
                             <button className={`mx-1 w-[auto] bg-blue-400 hover:text-blue-400 border-blue-400  active:text-blue-600 space-x-3 font-semibold px-5  p-2 border-2 hover:bg-transparent rounded-md text-white capitalize`} onClick={removeImg}>Remove Image</button>
-                            <img src={"https://blog.logrocket.com/wp-content/uploads/2022/09/logrocket-logo-frontend-analytics.png"} alt="preview" />
-                            {/* </FormControl> */}
                         </Box>
                         <Divider />
                         <Box
@@ -250,27 +298,29 @@ function AddItem() {
                             mb={1}
                         >
                             <TextH2 heading={"CONFIRM YOUR LOCATION"} />
-                            <FormControl id="location" isRequired>
+                            <FormControl id="state" isRequired>
                                 <FormLabel>State</FormLabel>
-                                <Select placeholder='  ' Selected>
-                                    <option value="B.Tech" >Delhi</option>
-                                    <option value="BBA">Haryana</option>
-                                    <option value="MBA">Up</option>
+                                <Select name="state" placeholder='  ' Selected value={formData && formData.state}
+                                    onChange={handleFormData}>
+                                    <option value="delhi" >Delhi</option>
+                                    <option value="haryana">Haryana</option>
+                                    <option value="up">Up</option>
                                 </Select>
                             </FormControl>
                             <FormControl id="city">
                                 <FormLabel>City</FormLabel>
                                 <Input
-                                    // value={email}
+                                    name="city"
                                     type="text"
-                                // onChange={(e) => setEmail(e.target.value)}
+                                    value={formData && formData.city}
+                                    onChange={handleFormData}
                                 />
                             </FormControl>
                         </Box>
                         <Divider />
-                        <div className='p-2 flex flex-col'>
-                            <Button variant="solid" colorScheme="green" isLoading={buttonLoading} onClick={handleSubmit} loadingText="It may take few seconds">Post Now</Button>
-                        </div>
+                        {/* <div className='p-2 flex flex-col'> */}
+                        <Button variant="solid" w={"100%"} colorScheme="green" isLoading={buttonLoading} type="submit" onClick={handleSubmit} loadingText="It may take few seconds">Post Now</Button>
+                        {/* </div> */}
                     </Box>
                 </Container>
             </div>

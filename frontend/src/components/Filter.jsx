@@ -1,7 +1,7 @@
 import { Button } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { AiOutlineSearch } from 'react-icons/ai'
-import ItemsLoading from '../Loading/ItemsLoading';
+import ItemsLoading from './Loading/ItemsLoading';
 
 function Filter() {
     const [name, setName] = useState("");

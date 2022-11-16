@@ -1,13 +1,16 @@
 const jwt = require("jsonwebtoken");
 
-const sendToken = (user, statusCode, res, msg) => {
+const sendToken = (user, statusCode, res, message) => {
   const token = createAccessToken({ id: user._id });
 
   const options = {
     expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     httpOnly: true,
   };
-  res.status(statusCode).cookie("jwtToken", token, options).json({ msg });
+  res
+    .status(statusCode)
+    .cookie("jwtToken", token, options)
+    .json({ message, user });
 };
 
 const createAccessToken = (payload) => {

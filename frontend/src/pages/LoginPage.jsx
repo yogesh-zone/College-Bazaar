@@ -1,7 +1,7 @@
 import { Box, Container, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from '@chakra-ui/react'
 import React from 'react'
-import Login from '../Authentication/Login';
-import Signup from '../Authentication/Signup';
+import Login from '../components/Authentication/Login';
+import Signup from '../components/Authentication/Signup';
 import { MetaData } from '../components/Utility';
 // import animationData from "../Animations/chatLoading.json"
 

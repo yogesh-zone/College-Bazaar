@@ -4,13 +4,14 @@ import { IoNotificationsOutline, IoChatbubbleEllipsesOutline } from "react-icons
 // import { FiLogOut, FiSettings } from "react-icons/fi";
 import { MdMenu } from "react-icons/md";
 import React, { useState } from 'react'
-import { AvatarIcon, link } from "../components/Utility";
+import { AvatarIcon, link } from "../Utility";
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 function Navbar() {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [active, setActive] = useState("");
     const [user, setUser] = useState(false);
+    const navigate = useNavigate();
     useEffect(() => {
         // setUser(!user);
     }, [active, user])
@@ -95,7 +96,7 @@ function Navbar() {
                 {/* **** show when no user login on all sm md and lg*/}
                 {/* <div className="flex justify-around items-center w-[20%] "> */}
                 {/* <ButtonGhost name="sign in" path="/login" /> */}
-                {!user && <Button variant="solid" color="blue.400" background="transparent" border="solid" _hover={{ background: "blue.500", textColor: "white", borderColor: "blue.400" }} _active={{ background: "transparent" }} ><Link to="/login">Sign In</Link></Button>}
+                {!user && <Button variant="solid" onClick={() => navigate('/login')} color="blue.400" background="transparent" border="solid" _hover={{ background: "blue.500", textColor: "white", borderColor: "blue.400" }} _active={{ background: "transparent" }} >Sign In</Button>}
                 {/* <Button colorScheme='cyan' variant='ghost' link="/login"><Link to="/login">Sing in</Link> </Button>
                     <Button colorScheme='cyan' color={'white'} variant='solid' link="#">Sign up</Button> */}
                 {/*  */}

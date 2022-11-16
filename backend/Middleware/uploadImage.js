@@ -8,6 +8,8 @@ const removeTmp = (path) => {
 
 module.exports = async function (req, res, next) {
   try {
+    console.log(req.body);
+    return res.json({ msg: "api success" });
     if (!req.files || Object.keys(req.files).length === 0)
       return res.status(400).json({ msg: "No files were uploaded." });
 

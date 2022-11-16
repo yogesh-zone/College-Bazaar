@@ -4,7 +4,8 @@ const cors = require("cors");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
-
+const error = require("./Middleware/error");
+const ErrorHandler = require("./Utils/errorHandler");
 app.use(express.json());
 app.use(cors());
 app.use(cookieParser());
@@ -29,20 +30,20 @@ if (process.env.NODE_ENV !== "PRODUCTION") {
 
 //all routes here
 //for user
-app.use("/user", require("./Routes/userRouter"));
+app.use("/api/user", require("./Routes/userRouter"));
 // for ads
-app.use("/adCard", require("./Routes/adcardRouter"));
+app.use("/api/adCard", require("./Routes/adcardRouter"));
 // for chats
 app.use("/api/chat", require("./Routes/chatRouter"));
 // for messages
 app.use("/api/message", require("./Routes/messageRouter"));
 
-app.get("/", (req, res, next) => {
-  res.send("hello this is the landing page");
+app.get("/cpi", (req, res, next) => {
+  return next(new ErrorHandler("hey we did it", 400));
+  // res.status(404);
+  // res.json({ succes: false, msg: "hello frontend" });
 });
 
-app.get("/home", (req, res, next) => {
-  res.send("hello this is the home page");
-});
+app.use(error);
 
 module.exports = app;

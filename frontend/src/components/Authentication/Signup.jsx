@@ -1,4 +1,5 @@
 import { Button } from "@chakra-ui/button";
+import { Checkbox } from "@chakra-ui/react";
 import { FormControl, FormLabel } from "@chakra-ui/form-control";
 import { Input, InputGroup, InputRightElement } from "@chakra-ui/input";
 import { VStack } from "@chakra-ui/layout";
@@ -6,24 +7,25 @@ import { useToast } from "@chakra-ui/toast";
 import axios from "axios";
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
-// import { useHistory } from "react-router";
+import { useNavigate } from "react-router";
 
 const Signup = () => {
     const [show, setShow] = useState(false);
     const handleClick = () => setShow(!show);
     const toast = useToast();
-    // const history = useHistory();
+    const navigator = useNavigate();
 
     const [name, setName] = useState();
     const [email, setEmail] = useState();
     const [confirmpassword, setConfirmpassword] = useState();
     const [password, setPassword] = useState();
-    const [pic, setPic] = useState();
-    const [picLoading, setPicLoading] = useState(false);
+    const [phone, setPhone] = useState();
+    const [showPhone, setShowPhone] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const submitHandler = async () => {
-        setPicLoading(true);
-        if (!name || !email || !password || !confirmpassword) {
+        setLoading(true);
+        if (!name || !email || !password || !confirmpassword || !phone) {
             toast({
                 title: "Please Fill all the Feilds",
                 status: "warning",
@@ -31,7 +33,7 @@ const Signup = () => {
                 isClosable: true,
                 position: "bottom",
             });
-            setPicLoading(false);
+            setLoading(false);
             return;
         }
         if (password !== confirmpassword) {
@@ -42,35 +44,37 @@ const Signup = () => {
                 isClosable: true,
                 position: "bottom",
             });
+            setLoading(false);
             return;
         }
-        console.log(name, email, password, pic);
+        console.log(name, email, password, phone, showPhone);
         try {
-            const config = {
-                headers: {
-                    "Content-type": "application/json",
-                },
-            };
+            // const config = {
+            //     headers: {
+            //         "Content-type": "application/json",
+            //     },
+            // };
             const { data } = await axios.post(
-                "/api/user",
+                "/api/user/register",
                 {
                     name,
                     email,
                     password,
-                    pic,
+                    phone,
+                    showPhone
                 },
-                config
+
             );
-            console.log(data);
             toast({
-                title: "Registration Successful",
+                title: data.message,
                 status: "success",
-                duration: 3000,
+                duration: 5000,
                 isClosable: true,
                 position: "bottom",
             });
-            localStorage.setItem("userInfo", JSON.stringify(data));
-            setPicLoading(false);
+            // localStorage.setItem("userInfo", JSON.stringify(data));
+            setLoading(false);
+            navigator('/user/activate/:activation_token');
             // history.push("/chats");
         } catch (error) {
             toast({
@@ -81,54 +85,10 @@ const Signup = () => {
                 isClosable: true,
                 position: "bottom",
             });
-            setPicLoading(false);
+            setLoading(false);
         }
     };
 
-    const postDetails = (pics) => {
-        setPicLoading(true);
-        if (pics === undefined) {
-            toast({
-                title: "Please Select an Image!",
-                status: "warning",
-                duration: 5000,
-                isClosable: true,
-                position: "bottom",
-            });
-            return;
-        }
-        console.log(pics);
-        if (pics.type === "image/jpeg" || pics.type === "image/png") {
-            const data = new FormData();
-            data.append("file", pics);
-            data.append("upload_preset", "chat-app");
-            data.append("cloud_name", "piyushproj");
-            fetch("https://api.cloudinary.com/v1_1/piyushproj/image/upload", {
-                method: "post",
-                body: data,
-            })
-                .then((res) => res.json())
-                .then((data) => {
-                    setPic(data.url.toString());
-                    console.log(data.url.toString());
-                    setPicLoading(false);
-                })
-                .catch((err) => {
-                    console.log(err);
-                    setPicLoading(false);
-                });
-        } else {
-            toast({
-                title: "Please Select an Image!",
-                status: "warning",
-                duration: 5000,
-                isClosable: true,
-                position: "bottom",
-            });
-            setPicLoading(false);
-            return;
-        }
-    };
 
     return (
         <VStack spacing="5px">
@@ -190,21 +150,23 @@ const Signup = () => {
                     </InputRightElement>
                 </InputGroup>
             </FormControl>
-            <FormControl id="pic">
-                <FormLabel>Upload your Picture</FormLabel>
+            <FormControl id="phone" isRequired>
+                <FormLabel>Phone</FormLabel>
                 <Input
-                    type="file"
-                    p={1.5}
-                    accept="image/*"
-                    onChange={(e) => postDetails(e.target.files[0])}
+                    placeholder="Enter Your Mobile no."
+                    type="number"
+                    onChange={(e) => setPhone(e.target.value)}
                 />
+                <Checkbox value={showPhone} borderColor="black" colorScheme='green' onChange={(e) => setShowPhone(!showPhone)}>
+                    Show phone number to other users
+                </Checkbox>
             </FormControl>
             <Button
                 colorScheme="blue"
                 width="100%"
                 style={{ marginTop: 15 }}
                 onClick={submitHandler}
-                isLoading={picLoading}
+                isLoading={loading}
             >
                 Sign Up
             </Button>

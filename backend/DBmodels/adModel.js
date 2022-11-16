@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const adSchema = mongoose.Schema({
   name: {
     type: String,
-    require: [true, "Please fill name of item!"],
+    require: [true, "Please fill in name"],
     trime: true,
   },
 
@@ -12,22 +12,14 @@ const adSchema = mongoose.Schema({
     trime: true,
   },
 
-  image: [
-    {
-      url: {
-        type: String,
-        require: [true, "Please upload your item's image!"],
-      },
-      public_id: {
-        type: String,
-        require: [true, "Please upload your item's image!"],
-      },
-    },
-  ],
-
   Category: {
     type: String,
     default: "All",
+  },
+
+  course: {
+    type: String,
+    require: [true, "Please select a course"],
   },
 
   semester: {
@@ -35,14 +27,18 @@ const adSchema = mongoose.Schema({
     require: [true, "Please fill in semester input!"],
   },
 
+  allImage: [],
+
+  price: {
+    type: Number,
+    require: [true, "Please set a price"],
+  },
+
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
-  course: {
-    type: String,
-    require: [true, "Please fill in course detail"],
-  },
+
   address: {
     city: {
       type: String,

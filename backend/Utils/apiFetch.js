@@ -2,25 +2,27 @@ class ApiFetchure {
   constructor(ads, query) {
     this.ads = ads;
     this.query = query;
-    console.log("hello-yellow");
   }
 
   search() {
     // search ads by name
     if (!this.query) {
-      console.log("hello");
       return this;
     }
-    const { name, category, semester, state } = this.query;
+    const { name, category, course, semester, state } = this.query;
     if (name) {
       this.ads = this.ads.find({ name: { $regex: name }, $options: "i" });
+    }
+
+    // search by couser
+    if (course) {
+      this.ads = this.ads.find({ course });
     }
 
     // search by semester
     if (semester) {
       this.ads = this.ads.find({ semester });
     }
-
     //search by Category
     if (category) {
       if (category == "All") {

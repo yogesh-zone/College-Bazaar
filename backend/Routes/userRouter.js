@@ -9,7 +9,7 @@ router.post("/register", userCtrl.register);
 
 router.post("/activation/:activation_token", userCtrl.activateEmail);
 
-router.get("/login", userCtrl.login);
+router.post("/login", userCtrl.login);
 
 // router
 // .post('/refresh_token', userCtrl.getAccessToken);
