@@ -1,4 +1,5 @@
-import { Box } from "@chakra-ui/react";
+import { Avatar, Box, Text } from "@chakra-ui/react";
+import SingleChat from "./SingleChat";
 
 const Chatbox = ({ fetchAgain, setFetchAgain }) => {
     // const { selectedChat } = ChatState();
@@ -8,15 +9,19 @@ const Chatbox = ({ fetchAgain, setFetchAgain }) => {
             d={{ base: selectedChat ? "flex" : "none", md: "flex" }}
             alignItems="center"
             flexDir="column"
-            p={3}
             bg="white"
             w={{ base: "100%", md: "68%" }}
             borderRadius="lg"
             borderWidth="1px"
-            background="red"
+            overflow={"hidden"}
+            background="gray.900"
         >
-            single chat
-            {/* <SingleChat fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} /> */}
+            <Box display="flex" p={3} justifyContent="start" background="gray.700" justifyItems="center" gap={3} alignItems="center">
+                <Avatar size={'sm'}></Avatar>
+                <Text color="white" fontSize={'xl'}>Yogesh Balodi</Text>
+            </Box>
+            <SingleChat />
+            {/* fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} */}
         </Box>
     );
 };

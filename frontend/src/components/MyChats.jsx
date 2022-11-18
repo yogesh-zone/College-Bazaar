@@ -1,5 +1,6 @@
 import { AddIcon } from "@chakra-ui/icons";
 import { Box, Stack, Text } from "@chakra-ui/layout";
+import { Avatar } from "@chakra-ui/react";
 import { useToast } from "@chakra-ui/toast";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -12,8 +13,8 @@ import { useEffect, useState } from "react";
 const MyChats = ({ fetchAgain }) => {
     const [loggedUser, setLoggedUser] = useState({});
 
-    const { selectedChat, setSelectedChat, user, chats, setChats } = {};
-
+    const { setSelectedChat, user, setChats } = {};
+    const selectedChat = { latestMessage: { sender: { name: "Yogesh Balodi" }, content: "hello yogesh how are you i am fine" }, _id: 8 };
     const toast = useToast();
 
     // fetch the latest msg from either of the user in room
@@ -47,9 +48,16 @@ const MyChats = ({ fetchAgain }) => {
         // eslint-disable-next-line
     }, [fetchAgain]);
 
+    const chats = [
+        { sender: "Yogesh Balodi", latestMessage: { sender: { name: "Yogesh Balodi" }, content: "hello yogesh how are you i am fine" }, _id: 123 },
+        { sender: "ABC Balodi", latestMessage: { sender: { name: "Yogesh Balodi" }, content: "hello yogesh how are you i am fine" }, _id: 4 },
+        { sender: "DEF Balodi", latestMessage: { sender: { name: "Yogesh Balodi" }, content: "hello yogesh how are you i am fine" }, _id: 5 },
+        { sender: "GFG Balodi", latestMessage: { sender: { name: "Yogesh Balodi" }, content: "hello yogesh how are you i am fine" }, _id: 6 },
+        { sender: "Leet Code", _id: 6 },
+    ]
     return (
         <Box
-            d={{ base: selectedChat ? "none" : "flex", md: "flex" }}
+            display={{ base: selectedChat ? "none" : "flex", md: "flex" }}
             flexDir="column"
             alignItems="center"
             p={3}
@@ -57,76 +65,76 @@ const MyChats = ({ fetchAgain }) => {
             w={{ base: "100%", md: "31%" }}
             borderRadius="lg"
             borderWidth="1px"
-            background="red.200"
+            background="gray.900"
         >
             <Box
                 pb={3}
                 px={3}
                 fontSize={{ base: "28px", md: "30px" }}
                 fontFamily="Work sans"
-                d="flex"
+                display="flex"
                 w="100%"
                 justifyContent="space-between"
                 alignItems="center"
-                background="blue.300"
+                // borderRadius={"lg"}
+                background="gray.900"
+                color="white"
             >
                 My Chats
-                {/* <GroupChatModal>
-                    <Button
-                        d="flex"
-                        fontSize={{ base: "17px", md: "10px", lg: "17px" }}
-                        rightIcon={<AddIcon />}
-                    >
-                        New Group Chat
-                    </Button>
-                </GroupChatModal> */}
             </Box>
             <Box
-                d="flex"
+                display="flex"
                 flexDir="column"
                 p={2}
                 bg="#F8F8F8"
                 w="100%"
                 h="100%"
-                borderRadius="lg"
+                // borderRadius="lg"
                 overflowY="hidden"
-                background={"pink.400"}
+                background={"gray.800"}
             >
+                {
+
+                }
                 {chats ? (
-                    <Stack overflowY="scroll">
+                    <Stack overflowY="auto" h={"100%"}>
                         {chats.map((chat) => (
                             <Box
                                 onClick={() => setSelectedChat(chat)}
                                 cursor="pointer"
-                                bg={selectedChat === chat ? "#C2C0BF" : "#E8E8F4"}
-                                color={selectedChat === chat ? "black" : "black"}
-                                _hover={{ bg: "#D8D8D8" }}
-                                px={2}
+                                display="flex"
+                                justifyContent="between"
+                                bg={selectedChat._id === chat._id ? "gray.300" : "gray.700"}
+                                color={selectedChat._id === chat._id ? "black" : "white"}
+                                _hover={{ bg: "gray.600" }}
+                                px={1}
                                 py={2}
-                                borderRadius="lg"
+                                // borderRadius="lg"
                                 key={chat._id}
                             >
-                                <Text>
-                                    {!chat.isGroupChat
-                                        ? 'getSender(loggedUser, chat.users)'
-                                        : 'chat.chatName'}
-                                </Text>
-                                {chat.latestMessage && (
-                                    <Text fontSize="xs">
-                                        <b>{chat.latestMessage.sender.name} : </b>
-                                        {chat.latestMessage.content.length > 50
-                                            ? chat.latestMessage.content.substring(0, 51) + "..."
-                                            : chat.latestMessage.content}
+                                <Avatar></Avatar>
+                                <Box px={2}>
+                                    <Text>
+                                        {chat.sender}
                                     </Text>
-                                )}
+                                    {chat.latestMessage && (
+                                        <Text fontSize="xs">
+                                            <b>{chat.latestMessage.sender.name} : </b>
+                                            {chat.latestMessage.content.length > 25
+                                                ? chat.latestMessage.content.substring(0, 25) + "..."
+                                                : chat.latestMessage.content}
+                                        </Text>
+                                    )}
+                                </Box>
                             </Box>
                         ))}
                     </Stack>
-                ) : (
-                    '<ChatLoading />'
+                ) : (<>
+                    <div className="p-2 text-2xl font-semibold h-[100%] flex items-center justify-center text-center text-white">No chats available</div>
+                </>
                 )}
             </Box>
-        </Box>
+        </Box >
     );
 };
 
