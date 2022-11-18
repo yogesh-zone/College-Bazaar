@@ -16,7 +16,7 @@ const Chats = () => {
         <div style={{ width: "100%" }}>
             {/*  SideDrawer -->  this is for header/navbar part and a sider drawer open when we click on search users */}
             {/* {user && <SideDrawer />} */}
-            <Box display="flex" justifyContent="space-between" w="100%" h="91.5vh" p="10px">
+            <Box display="flex" justifyContent="space-between" w="100%" h="82vh">
                 {/* MyChats -->  show left side of the chat means all users on chat (100% width uptill md and for lg it is on left side)*/}
                 {user && <MyChats />}  {/* params --->  fetchAgain={fetchAgain} */}
                 {user && (

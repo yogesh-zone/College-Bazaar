@@ -20,9 +20,9 @@ function Navbar() {
         onClose();
     }
     return (
-        <div className="bg-[#242e34] text-white py-2 px-1 flex justify-between items-center h-[15vh] lg:sticky top-0 z-50">
+        <div className="bg-[#242e34] text-white py-2 px-1 flex justify-between items-center h-[12vh] lg:sticky top-0 z-50">
             {/* nav part 1 -> logo part 2 -> name part 3 -> links  */}
-            <Link to="/" className="w-[35%] sm:w-[15%] md:w-[12%] lg:w-[10%] sm:justify-center md:justify-start lg:justify-center  align-middle items-center cursor-pointer  h-[100%] flex p-1 bg-"> <div className="h-full w-full NavLogo bg-cover overflow-auto rounded-md p-2 "></div></Link>
+            <Link to="/" className="w-[35%] sm:w-[15%] md:w-[12%] lg:w-[8%] sm:justify-center md:justify-start lg:justify-center  align-middle items-center cursor-pointer  h-[100%] flex p-1 bg-"> <div className="h-full w-full NavLogo bg-cover overflow-auto rounded-md p-2 "></div></Link>
             <Link to='/' className="hidden sm:flex p-2 justify-start sm:justify-center lg:justify-start  text-3xl md:text-4xl lg:text-2xl font-semibold items-center cursor-pointer"> College Bazaar</Link>
             <div className="w-[50%] sm:w-[20%] md:w-[20%] lg:w-[70%] flex p-2 justify-end sm:justify-around items-center lg:justify-between">
                 {/* part 1 = all link part2 = notify and menu  */}

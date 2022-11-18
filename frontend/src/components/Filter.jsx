@@ -46,7 +46,7 @@ function Filter() {
     }
     return (
         <>
-            <div className=' sticky top-0 lg:top-[15vh] overflow-hidden'>
+            <div className='sticky top-0 lg:top-[12vh] overflow-hidden'>
 
                 <form className='bg-gray-700 flex -mt-0.5 flex-row flex-wrap justify-between lg:justify-around items-center p-3'
                     onSubmit={handleSubmit}>

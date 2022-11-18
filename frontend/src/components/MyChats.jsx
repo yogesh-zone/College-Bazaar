@@ -60,9 +60,10 @@ const MyChats = ({ fetchAgain }) => {
             display={{ base: selectedChat ? "none" : "flex", md: "flex" }}
             flexDir="column"
             alignItems="center"
-            p={3}
+            // p={3}
+            overflow={'hidden'}
             bg="white"
-            w={{ base: "100%", md: "31%" }}
+            w={{ base: "100%", md: "32%" }}
             borderRadius="lg"
             borderWidth="1px"
             background="gray.900"
@@ -74,13 +75,12 @@ const MyChats = ({ fetchAgain }) => {
                 fontFamily="Work sans"
                 display="flex"
                 w="100%"
-                justifyContent="space-between"
-                alignItems="center"
+                justifyItems={'center'}
                 // borderRadius={"lg"}
                 background="gray.900"
                 color="white"
             >
-                My Chats
+                <Text>My Chats</Text>
             </Box>
             <Box
                 display="flex"
@@ -89,30 +89,26 @@ const MyChats = ({ fetchAgain }) => {
                 bg="#F8F8F8"
                 w="100%"
                 h="100%"
-                // borderRadius="lg"
                 overflowY="hidden"
                 background={"gray.800"}
             >
-                {
-
-                }
                 {chats ? (
-                    <Stack overflowY="auto" h={"100%"}>
+                    <Stack overflowY="auto" gap={0} h={"100%"}>
                         {chats.map((chat) => (
                             <Box
                                 onClick={() => setSelectedChat(chat)}
                                 cursor="pointer"
                                 display="flex"
+                                borderRadius="lg"
                                 justifyContent="between"
+                                // alignItems={'center'}
                                 bg={selectedChat._id === chat._id ? "gray.300" : "gray.700"}
                                 color={selectedChat._id === chat._id ? "black" : "white"}
                                 _hover={{ bg: "gray.600" }}
-                                px={1}
-                                py={2}
-                                // borderRadius="lg"
+                                p={2}
                                 key={chat._id}
                             >
-                                <Avatar></Avatar>
+                                <Avatar size="md"></Avatar>
                                 <Box px={2}>
                                     <Text>
                                         {chat.sender}
