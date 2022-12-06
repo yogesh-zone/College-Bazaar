@@ -13,53 +13,66 @@ import {
     Text,
     Image,
     Avatar,
+    Box,
 } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
 
 const ProfileModal = ({ user, children }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
-
     return (
         <>
             {children ? (
                 <span onClick={onOpen}>{children}</span>
             ) : (
-                <Avatar d={{ base: "flex" }} size="md" onClick={onOpen}></Avatar>
-                // <IconButton d={{ base: "flex" }} icon={<ViewIcon />} onClick={onOpen} />
+                <Avatar display='flex' alt={user.name} src={user.avatar.url} size="md" onClick={onOpen}></Avatar>
             )}
             <Modal size="lg" onClose={onClose} isOpen={isOpen} isCentered>
                 <ModalOverlay />
-                <ModalContent h="410px">
+                <ModalContent h="410px" bg='gray.700' color='white'>
                     <ModalHeader
                         fontSize="40px"
                         fontFamily="Work sans"
-                        d="flex"
+                        display="flex"
                         justifyContent="center"
+                        bg='gray.300'
+                        color='black'
                     >
                         {user.name}
                     </ModalHeader>
-                    <ModalCloseButton />
+                    <ModalCloseButton color='black' />
                     <ModalBody
-                        d="flex"
+                        display="flex"
                         flexDir="column"
                         alignItems="center"
                         justifyContent="space-between"
                     >
                         {/* <Image
                             borderRadius="full"
-                            boxSize="150px"
-                            src={user.pic}
+                            boxSize="140px"
+                            src={user.avatar.url}
                             alt={user.name}
                         /> */}
-                        <Avatar size='md' ></Avatar>
-                        <Text
-                            fontSize={{ base: "28px", md: "30px" }}
-                            fontFamily="Work sans"
-                        >
-                            Email: {user.email}
-                        </Text>
+                        <Avatar size='2xl' alt={user.name} src={user.avatar.url}></Avatar>
+                        <Box>
+                            <Text
+                                fontSize={{ base: "28px", md: "30px" }}
+                                fontFamily="Work sans"
+                            >
+                                Email: {user.email}
+                            </Text>
+                            {(user.phone && user.phone.showPhone) && <Text
+                                fontSize={{ base: "28px", md: "30px" }}
+                                fontFamily="Work sans"
+                            >
+                                Phone: {user.phone.phone}
+                            </Text>}
+                        </Box>
+
                     </ModalBody>
-                    <ModalFooter>
-                        <Button onClick={onClose}>Close</Button>
+                    <ModalFooter display="flex" alignItems="center"
+                        justifyContent="space-between">
+                        <Link to="/" onClick={onClose}>More Info</Link>
+                        <Button colorScheme={'cyan'} onClick={onClose}>Close</Button>
                     </ModalFooter>
                 </ModalContent>
             </Modal>

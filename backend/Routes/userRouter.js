@@ -18,7 +18,7 @@ router.post("/forgot", userCtrl.forgotPassword);
 
 router.post("/reset/:reset_token", auth, userCtrl.resetPassword);
 
-router.get("/my_information", auth, userCtrl.getMyInfor);
+router.get("/", auth, userCtrl.loadUser);
 
 router.get("/information/:id", auth, adminAuth, userCtrl.getUserInfor);
 
@@ -30,12 +30,13 @@ router.put("/forgotPassword", userCtrl.forgotPassword);
 
 router.put("/updatePassword", auth, userCtrl.updatePassword);
 
-router.patch("/update_User", auth, userCtrl.updateUser);
+router.put("/update_User", auth, userCtrl.updateUser);
 
-router.patch("/update_role/:id", auth, adminAuth, userCtrl.updateUserRole);
+router.put("/update_role/:id", auth, adminAuth, userCtrl.updateUserRole);
 
 router.delete("/delete_user/:id", auth, adminAuth, userCtrl.deleteUser);
 
-router.put("/upload_avatar", uploadImage, auth, userCtrl.uploadAvatar);
+router.put("/upload_avatar", auth, userCtrl.uploadAvatar); // uploadImage
+//api.cloudinary.com/v1_1/dbej3vdgp/image/upload
 
-module.exports = router;
+https: module.exports = router;

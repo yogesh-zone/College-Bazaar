@@ -15,6 +15,7 @@ function ItemsLoading() {
             <Lottie
                 options={defaultOptions}
                 width={"60%"}
+                bg='transparent'
                 isClickToPauseDisabled={true}
                 style={{ cursor: "default" }}
             />

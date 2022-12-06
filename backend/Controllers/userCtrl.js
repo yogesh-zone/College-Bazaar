@@ -22,9 +22,11 @@ const userCtrl = {
       if (phone && !validatePhoneNumber(phone)) {
         return next(new ErrorHandler("Invalid mobile number.", 400));
       }
-      const user = await User.findOne({ email });
+      const user = await User.findOne({
+        email: { $regex: new RegExp(email, "i") },
+      });
       if (user)
-        return next(new ErrorHandler("Invalid email or password.", 400));
+        return next(new ErrorHandler("This account already exist", 400));
 
       const passwordHash = await bcrypt.hash(password, 12);
       const newUser = {
@@ -58,10 +60,12 @@ const userCtrl = {
         process.env.JWT_ACTIVATION_TOKEN_SECRET
       );
 
-      // console.log(user);
+      console.log("under route", user);
       const { name, email, password, phone } = user;
 
-      const check = await User.findOne({ email });
+      const check = await User.findOne({
+        email: { $regex: new RegExp(email, "i") },
+      });
       if (check) {
         return next(new ErrorHandler("This email already exist.", 400));
       }
@@ -73,6 +77,7 @@ const userCtrl = {
       });
       await newUser.save();
       sendToken(newUser, 201, res, "Account has been activated!");
+      return;
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
     }
@@ -85,7 +90,9 @@ const userCtrl = {
         return next(new ErrorHandler("Please fill in all fields.", 400));
       }
 
-      const user = await User.findOne({ email }).select("+password");
+      const user = await User.findOne({
+        email: { $regex: new RegExp(email, "i") },
+      }).select("+password");
       if (!user) {
         return next(new ErrorHandler("Invalid email or password", 400));
       }
@@ -101,6 +108,18 @@ const userCtrl = {
     }
   },
 
+  // Get User Detail / load user
+  loadUser: async (req, res, next) => {
+    try {
+      const user = await User.findById(req.user.id);
+      if (!user) {
+        return next(new ErrorHandler("not logged In", 400));
+      }
+      res.json({ user: user });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
   // getAccessToken: async (req,res)=>{
   //     try {
 
@@ -125,7 +144,9 @@ const userCtrl = {
   forgotPassword: async (req, res, next) => {
     try {
       const { email } = req.body;
-      const user = await User.findOne({ email });
+      const user = await User.findOne({
+        email: { $regex: new RegExp(email, "i") },
+      });
       if (!user) {
         return next(new ErrorHandler("Invalid email.", 400));
       }
@@ -154,7 +175,9 @@ const userCtrl = {
         reset_token,
         process.env.JWT_RESET_TOKEN_SECRET
       );
-      const user = await User.findOne({ email }).select("+password");
+      const user = await User.findOne({
+        email: { $regex: new RegExp(email, "i") },
+      }).select("+password");
       if (
         !user ||
         !user.resetPasswordExpire ||
@@ -196,7 +219,7 @@ const userCtrl = {
     try {
       const user = await User.findById(req.params.id);
       if (!user) {
-        next(new ErrorHandler("No user found.", 400));
+        next(new ErrorHandler("User not found.", 400));
       }
       res.json({ msg: user });
     } catch (error) {
@@ -204,17 +227,17 @@ const userCtrl = {
     }
   },
 
-  getMyInfor: async (req, res, next) => {
-    try {
-      const user = await User.findById(req.user.id);
-      if (!user) {
-        next(new ErrorHandler("Invalid user", 400));
-      }
-      res.json({ msg: user });
-    } catch (error) {
-      return res.status(500).json(error.message);
-    }
-  },
+  // getMyInfor: async (req, res, next) => {
+  //   try {
+  //     const user = await User.findById(req.user.id);
+  //     if (!user) {
+  //       next(new ErrorHandler("Invalid user", 400));
+  //     }
+  //     res.json({ msg: user });
+  //   } catch (error) {
+  //     return res.status(500).json(error.message);
+  //   }
+  // },
 
   getUsersAllInfor: async (req, res, next) => {
     try {
@@ -238,12 +261,20 @@ const userCtrl = {
   updateUser: async (req, res, next) => {
     try {
       const { name, phone } = req.body;
-      if (phone && !validatePhoneNumber(phone)) {
-        return res.status(400).json({ msg: "Invalid phone number" });
+      console.log(phone);
+      if (phone.phone && !validatePhoneNumber(phone.phone)) {
+        console.log(phone.phone);
+        return next(new ErrorHandler("Invalid phone number", 400));
       }
-      await User.findOneAndUpdate({ _id: req.user.id }, req.body);
-      return res.json({ msg: "Update success!" });
-    } catch (err) {}
+      const user = await User.findByIdAndUpdate(req.user.id, req.body, {
+        new: true,
+        runValidators: true,
+        useFindAndModify: false,
+      });
+      return res.json({ message: "Update success!", user });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 400));
+    }
   },
 
   updateUserRole: async (req, res, next) => {
@@ -284,27 +315,20 @@ const userCtrl = {
 
   uploadAvatar: async (req, res, next) => {
     try {
+      console.log(req.body);
+      const { url, public_id } = req.body;
       const user = await User.findById(req.user.id);
       const imgId = user.avatar.public_id;
       if (imgId) {
         // destroy the photo on cloud
         await cloudinary.v2.uploader.destroy(imgId);
       }
-      const files = req.files;
-      const file = files.file;
-      const result = await cloudinary.v2.uploader.upload(file.tempFilePath, {
-        folder: "College Bazaar",
-        width: 150,
-        height: 150,
-        crop: "fill",
-      });
-
-      user.avatar.url = result.secure_url;
-      user.avatar.public_id = result.public_id;
+      user.avatar.url = url;
+      user.avatar.public_id = public_id;
       user.save();
-      return res.json({ msg: result });
-    } catch (err) {
-      return res.status(500).json({ msg: err.message });
+      return res.json({ sucess: true });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
     }
   },
 };
@@ -317,7 +341,6 @@ const validateEmail = (email) => {
 
 function validatePhoneNumber(input_str) {
   var re = /^\(?(\d{3})\)?[- ]?(\d{3})[- ]?(\d{4})$/;
-
   return re.test(input_str);
 }
 

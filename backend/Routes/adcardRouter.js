@@ -14,6 +14,8 @@ router.delete("/admin/delete/:_id", auth, authAdmin, adCtrl.adminDeleteAd);
 
 router.get("/all", adCtrl.allAds);
 
+router.get("/userAds", auth, adCtrl.userAllAds); //new added
+
 router.get("/:_id", adCtrl.aAd);
 
 module.exports = router;

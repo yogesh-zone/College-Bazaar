@@ -63,7 +63,6 @@ const Signup = () => {
                     phone,
                     showPhone
                 },
-
             );
             toast({
                 title: data.message,
@@ -75,11 +74,10 @@ const Signup = () => {
             // localStorage.setItem("userInfo", JSON.stringify(data));
             setLoading(false);
             navigator('/user/activate/:activation_token');
-            // history.push("/chats");
         } catch (error) {
             toast({
                 title: "Error Occured!",
-                description: error.response.data.message,
+                description: error.response.data.error,
                 status: "error",
                 duration: 5000,
                 isClosable: true,

@@ -9,9 +9,19 @@ class ApiFetchure {
     if (!this.query) {
       return this;
     }
+
     const { name, category, course, semester, state } = this.query;
+    // const Rname = name
+    //   ? {
+    //       name: { $regex: name, $options: "i" },
+    //     }
+    //   : {};
+    // this.ads = this.ads.find({ ...Rname });
+
     if (name) {
-      this.ads = this.ads.find({ name: { $regex: name }, $options: "i" });
+      this.ads = this.ads.find({
+        ...{ name: { $regex: name, $options: "i" } },
+      });
     }
 
     // search by couser

@@ -7,7 +7,10 @@ import axios from "axios";
 import { useToast } from "@chakra-ui/react";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from "react-router-dom";
-
+import { useDispatch, useSelector } from "react-redux"
+import { useEffect } from "react";
+import { clearErrors, login } from "../../actions/userActions";
+import { LOGIN_FAILS, LOGIN_SUCCESS } from "../../constants";
 const Login = () => {
     const [show, setShow] = useState(false);
     const handleClick = () => setShow(!show);
@@ -16,8 +19,9 @@ const Login = () => {
     const [password, setPassword] = useState();
     const [loading, setLoading] = useState(false);
 
-    const navigator = useNavigate();
+    const dispatch = useDispatch();
 
+    const navigator = useNavigate();
     const submitHandler = async () => {
         setLoading(true);
         if (!email || !password) {
@@ -37,11 +41,11 @@ const Login = () => {
                     "Content-type": "application/json",
                 },
             };
-            // const { data } = await axios.post('/cpi');
             const { data } = await axios.post(
                 "/api/user/login",
                 { email, password }
             );
+            dispatch({ type: LOGIN_SUCCESS, payload: data.user });
             toast({
                 title: "Login Successful",
                 status: "success",
@@ -52,9 +56,10 @@ const Login = () => {
             setLoading(false);
             navigator('/');
         } catch (error) {
+            dispatch({ type: LOGIN_FAILS, payload: error.response.data.message })
             toast({
                 title: "Error Occured!",
-                description: error.response.data.message,
+                description: error.response.data.error,
                 status: "error",
                 duration: 3000,
                 isClosable: true,

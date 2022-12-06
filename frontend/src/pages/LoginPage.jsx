@@ -1,8 +1,11 @@
 import { Box, Container, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from '@chakra-ui/react'
 import React from 'react'
+import { useEffect } from 'react';
 import Login from '../components/Authentication/Login';
 import Signup from '../components/Authentication/Signup';
 import { MetaData } from '../components/Utility';
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from "react-redux"
 // import animationData from "../Animations/chatLoading.json"
 
 function LoginPage() {
@@ -14,6 +17,15 @@ function LoginPage() {
     //         preserveAspectRatio: "xMidYMid slice",
     //     },
     // };
+    const navigator = useNavigate();
+    const { isAuthenticated } = useSelector(
+        (state) => state.user
+    );
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigator('/');
+        }
+    }, []);
     return (
         <>
             <MetaData title={"Login"} />

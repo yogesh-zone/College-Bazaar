@@ -4,57 +4,52 @@ import { Avatar } from "@chakra-ui/react";
 import { useToast } from "@chakra-ui/toast";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { getSender, getSenderImg } from "./Miscellaneous/ChatLogic";
+import { useSelector, useDispatch } from "react-redux"
+import { allChats, selecetedChat } from "../actions/chatAction";
 // import { getSender } from "../config/ChatLogics";
 // import ChatLoading from "./ChatLoading";
 // import GroupChatModal from "./miscellaneous/GroupChatModal";
 // import { background, Button } from "@chakra-ui/react";
 // import { ChatState } from "../Context/ChatProvider";
 
-const MyChats = ({ fetchAgain }) => {
-    const [loggedUser, setLoggedUser] = useState({});
+const MyChats = () => {
 
-    const { setSelectedChat, user, setChats } = {};
-    const selectedChat = { latestMessage: { sender: { name: "Yogesh Balodi" }, content: "hello yogesh how are you i am fine" }, _id: 8 };
+    // const [selectedChat, setSelectedChat] = useState([]);
+    // const [chats, setChats] = useState([]);
+    // const selectedChat = { latestMessage: { sender: { name: "Yogesh Balodi" }, content: "hello yogesh how are you i am fine" }, _id: 8 };
     const toast = useToast();
-
+    const { user } = useSelector(
+        (state) => state.user
+    );
+    const dispatch = useDispatch();
+    const { selectedChat } = useSelector((state) => state.chat);
+    const { chats, error } = useSelector((state) => state.chats);
     // fetch the latest msg from either of the user in room
     const fetchChats = async () => {
         // console.log(user._id);
-        try {
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${user.token}`,
-                },
-            };
-
-            const { data } = await axios.get("/api/chat", config);
-            setChats(data);
-            console.log(data);
-        } catch (error) {
-            toast({
-                title: "Error Occured!",
-                description: "Failed to Load the chats",
-                status: "error",
-                duration: 5000,
-                isClosable: true,
-                position: "bottom-left",
-            });
-        }
+        dispatch(allChats());
     };
-
     useEffect(() => {
-        setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
+        console.log("under effect")
         fetchChats();
-        // eslint-disable-next-line
-    }, [fetchAgain]);
+    }, [])
 
-    const chats = [
-        { sender: "Yogesh Balodi", latestMessage: { sender: { name: "Yogesh Balodi" }, content: "hello yogesh how are you i am fine" }, _id: 123 },
-        { sender: "ABC Balodi", latestMessage: { sender: { name: "Yogesh Balodi" }, content: "hello yogesh how are you i am fine" }, _id: 4 },
-        { sender: "DEF Balodi", latestMessage: { sender: { name: "Yogesh Balodi" }, content: "hello yogesh how are you i am fine" }, _id: 5 },
-        { sender: "GFG Balodi", latestMessage: { sender: { name: "Yogesh Balodi" }, content: "hello yogesh how are you i am fine" }, _id: 6 },
-        { sender: "Leet Code", _id: 6 },
-    ]
+    // useEffect(() => {
+    //     console.log("under effect chatss")
+    // }, [chats])
+
+
+    console.log("my chats ", selectedChat);
+
+
+    // const chats = [
+    //     { sender: "Yogesh Balodi", latestMessage: { sender: { name: "Yogesh Balodi" }, content: "hello yogesh how are you i am fine" }, _id: 123 },
+    //     { sender: "ABC Balodi", latestMessage: { sender: { name: "Yogesh Balodi" }, content: "hello yogesh how are you i am fine" }, _id: 4 },
+    //     { sender: "DEF Balodi", latestMessage: { sender: { name: "Yogesh Balodi" }, content: "hello yogesh how are you i am fine" }, _id: 5 },
+    //     { sender: "GFG Balodi", latestMessage: { sender: { name: "Yogesh Balodi" }, content: "hello yogesh how are you i am fine" }, _id: 6 },
+    //     { sender: "Leet Code", _id: 6 },
+    // ]
     return (
         <Box
             display={{ base: selectedChat ? "none" : "flex", md: "flex" }}
@@ -82,7 +77,7 @@ const MyChats = ({ fetchAgain }) => {
             >
                 <Text>My Chats</Text>
             </Box>
-            <Box
+            {chats && <Box
                 display="flex"
                 flexDir="column"
                 p={2}
@@ -96,26 +91,26 @@ const MyChats = ({ fetchAgain }) => {
                     <Stack overflowY="auto" gap={0} h={"100%"}>
                         {chats.map((chat) => (
                             <Box
-                                onClick={() => setSelectedChat(chat)}
+                                onClick={() => dispatch(selecetedChat(chat))}
                                 cursor="pointer"
                                 display="flex"
                                 borderRadius="lg"
                                 justifyContent="between"
                                 // alignItems={'center'}
-                                bg={selectedChat._id === chat._id ? "gray.300" : "gray.700"}
-                                color={selectedChat._id === chat._id ? "black" : "white"}
-                                _hover={{ bg: "gray.600" }}
+                                bg={(selectedChat && selectedChat._id === chat._id) ? "gray.800" : "gray.700"}
+                                color={(selectedChat && selectedChat._id === chat._id) ? "white" : "white"}
+                                _hover={{ bg: "gray.800" }}
                                 p={2}
                                 key={chat._id}
                             >
-                                <Avatar size="md"></Avatar>
+                                <Avatar size="md" src={getSenderImg(user, chat.users)}></Avatar>
                                 <Box px={2}>
-                                    <Text>
-                                        {chat.sender}
+                                    <Text className="capitalize font-semibold">
+                                        {getSender(user, chat.users)}
                                     </Text>
                                     {chat.latestMessage && (
                                         <Text fontSize="xs">
-                                            <b>{chat.latestMessage.sender.name} : </b>
+                                            <span className="font-medium">{chat.latestMessage.sender.name}</span> :
                                             {chat.latestMessage.content.length > 25
                                                 ? chat.latestMessage.content.substring(0, 25) + "..."
                                                 : chat.latestMessage.content}
@@ -129,7 +124,8 @@ const MyChats = ({ fetchAgain }) => {
                     <div className="p-2 text-2xl font-semibold h-[100%] flex items-center justify-center text-center text-white">No chats available</div>
                 </>
                 )}
-            </Box>
+            </Box>}
+
         </Box >
     );
 };

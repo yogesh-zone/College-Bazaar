@@ -1,22 +1,29 @@
 import { Avatar, Box, Button, Container, Divider, Fade, FormControl, FormLabel, Input, Select, Text, Textarea, useToast, VStack } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ButtonGhost, MetaData } from '../components/Utility'
 import ItemsLoading from '../components/Loading/ItemsLoading';
 import axios from "axios"
+
 function AddItem() {
     const [formData, setFormData] = useState({});
     const [sem, setSem] = useState(0);
     const [Course, setCourse] = useState("");
     const [file, setFile] = useState(null);
     const [allImg, setAllImg] = useState([]);
+    const [images, setImages] = useState([]);
+    const [files, setFiles] = useState([]);
+    const [uploadLoading, setUploadLoading] = useState(false);
+    const [uploaded, setUploaded] = useState(false);
     const imageMimeType = /image\/(png|jpg|jpeg)/i;
     const toast = useToast();
     const [buttonLoading, setButtonLoading] = useState(false);
     const fileUpload = useRef(null);
+    const navigator = useNavigate();
     const handleChange = (e) => {
         const file = e.target.files[0];
+
         if (!file.type.match(imageMimeType)) {
             toast({
                 title: "Image mime type is not valid",
@@ -34,8 +41,9 @@ function AddItem() {
     }
     const removeImg = () => {
         // if (allImg.length) {
+        setFile(null);
         setAllImg(allImg.filter((i) => (i !== allImg[allImg.length - 1])));
-        setFormData({ ...formData, allImg });
+        setFiles(files.filter((i) => (i !== files[files.length - 1])));
         // }
     }
     useEffect(() => {
@@ -56,7 +64,7 @@ function AddItem() {
                 const { result } = e.target;
                 if (result && !isCancel) {
                     setAllImg([...allImg, result]);
-                    setFormData({ ...formData, ["allImg"]: [...allImg, result] });
+                    setFiles([...files, file]);
                 }
             }
             fileReader.readAsDataURL(file);
@@ -91,6 +99,20 @@ function AddItem() {
     const handleUpload = () => {
         fileUpload.current.click();
     }
+    const postImages = async () => {
+        setUploadLoading(true);
+        for (let i = 0; i < files.length; i++) {
+            const imgData = new FormData();
+            imgData.append('file', files[i]);
+            imgData.append('upload_preset', "CollegeBazaar_Items");
+            const { data } = await axios.post('https://api.cloudinary.com/v1_1/dbej3vdgp/image/upload', imgData);
+            const result = { url: data.secure_url, public_id: data.public_id };
+            images.push(result);
+        }
+        setUploadLoading(false);
+        setUploaded(true);
+        return;
+    }
     const handleSubmit = async (e) => {
         setButtonLoading(true);
         if (!formData || !formData.name || !formData.description || !formData.course || !formData.semester || !formData.price || !formData.city || !formData.state) {
@@ -104,9 +126,19 @@ function AddItem() {
             setButtonLoading(false);
             return;
         }
-        if (!formData.allImg) {
+        if (!uploaded && !uploadLoading) {
             toast({
-                title: "Please upload atleast 2 photos",
+                title: "Please Upload Images",
+                status: "warning",
+                duration: 3000,
+                isClosable: true,
+                position: "bottom",
+            });
+            setButtonLoading(false);
+            return;
+        } else if (!uploaded) {
+            toast({
+                title: "Please wait images are uploading",
                 status: "warning",
                 duration: 3000,
                 isClosable: true,
@@ -115,21 +147,36 @@ function AddItem() {
             setButtonLoading(false);
             return;
         }
+        formData.images = images;
         console.log(formData);
         setButtonLoading(false);
-        return;
         try {
             const config = {
                 headers: {
                     "Content-Type": "multipart/form-data"
                 }
             };
-            const { data } = await axios.post('/api/adCard/new', { name: "yogsh", allImg }, config);
-            console.log("data is ", data);
+            const { data } = await axios.post('/api/adCard/new', formData);
+            toast({
+                title: `${data.message}`,
+                status: "success",
+                duration: 3000,
+                isClosable: true,
+                position: "bottom",
+            });
+            navigator('/');
+            setButtonLoading(false);
+            return;
         } catch (error) {
-            console.log('error occured!')
+            console.log(error);
+            toast({
+                title: `${error.response.data.error}`,
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+                position: "bottom",
+            });
         }
-        console.log("handle submit end!!");
         setButtonLoading(false);
     }
 
@@ -252,6 +299,29 @@ function AddItem() {
                             bg="white"
                             borderRadius="md"
                             w="100%"
+                            mb={1}>
+                            <TextH2 heading={"UPLOAD UP TO 6 PHOTOS"} />
+                            <div className='flex flex-wrap space-x-2 p-2 space-y-1'>
+                                <Input className='hidden' type="file" id="fileInput" accept='image/*' name="fileInput" ref={fileUpload} onChange={handleChange} />
+                                {Array(6).fill(' ').map((_, i) => (
+                                    <button type="button" key={i} onClick={!allImg[i] && handleUpload} className={`border-2 ${allImg[i] ? "opacity-100" : "opacity-40"} focus:opacity-100 border-gray-600 h-24 w-24 flex justify-center items-center `}>
+                                        {allImg[i] ? <img src={allImg[i]} className="h-[100%] w-[100%]" /> : <svg width="36px" height="36px" viewBox="0 0 1024 1024" data-aut-id="icon" class fill-rule="evenodd">
+                                            <path d="M841.099 667.008v78.080h77.568v77.653h-77.568v77.141h-77.568v-77.184h-77.611v-77.611h77.611v-78.080h77.568zM617.515 124.16l38.784 116.437h165.973l38.827 38.827v271.659l-38.827 38.357-38.741-38.4v-232.832h-183.125l-38.784-116.48h-176.853l-38.784 116.48h-183.083v426.923h426.667l38.784 38.357-38.784 39.253h-465.493l-38.741-38.869v-504.491l38.784-38.827h165.973l38.827-116.437h288.597zM473.216 318.208c106.837 0 193.92 86.955 193.92 194.048 0 106.923-87.040 194.091-193.92 194.091s-193.963-87.168-193.963-194.091c0-107.093 87.083-194.048 193.963-194.048zM473.216 395.861c-64.213 0-116.352 52.181-116.352 116.395 0 64.256 52.139 116.437 116.352 116.437 64.171 0 116.352-52.181 116.352-116.437 0-64.213-52.181-116.437-116.352-116.437z"></path>
+                                        </svg>}
+                                    </button>
+                                ))}
+                            </div>
+                            {!uploaded && allImg[0] && <Button isLoading={uploadLoading} colorScheme='green' m={2} onClick={postImages}>Upload</Button>}
+                            {(!uploadLoading && allImg[0] && !images[0]) && <Button colorScheme='red' onClick={removeImg}>Remove Image</Button>}
+                        </Box>
+                        <Divider />
+                        <Box
+                            d="flex"
+                            justifyContent="center"
+                            p={3}
+                            bg="white"
+                            borderRadius="md"
+                            w="100%"
                             mb={1}
                         >
                             <TextH2 heading={"SET A PRICE"} />
@@ -266,27 +336,6 @@ function AddItem() {
                             </FormControl>
                         </Box>
                         <Divider />
-                        <Box
-                            d="flex"
-                            justifyContent="center"
-                            p={3}
-                            bg="white"
-                            borderRadius="md"
-                            w="100%"
-                            mb={1}>
-                            <TextH2 heading={"UPLOAD UP TO 6 PHOTOS"} />
-                            <div className='flex flex-wrap space-x-2 p-2 space-y-1'>
-                                <Input className='hidden' type="file" id="fileInput" accept='image/*' name="fileInput" ref={fileUpload} onChange={handleChange} />
-                                {Array(6).fill(' ').map((_, i) => (
-                                    <button type="button" key={i} onClick={!allImg[i] && handleUpload} className={`border-2 ${allImg[i] ? "opacity-100" : "opacity-40"} focus:opacity-100 border-gray-600 h-24 w-24 flex justify-center items-center `}>
-                                        {allImg[i] ? <img src={allImg[i]} className="h-[100%] w-[100%]" /> : <svg width="36px" height="36px" viewBox="0 0 1024 1024" data-aut-id="icon" class fill-rule="evenodd">
-                                            <path d="M841.099 667.008v78.080h77.568v77.653h-77.568v77.141h-77.568v-77.184h-77.611v-77.611h77.611v-78.080h77.568zM617.515 124.16l38.784 116.437h165.973l38.827 38.827v271.659l-38.827 38.357-38.741-38.4v-232.832h-183.125l-38.784-116.48h-176.853l-38.784 116.48h-183.083v426.923h426.667l38.784 38.357-38.784 39.253h-465.493l-38.741-38.869v-504.491l38.784-38.827h165.973l38.827-116.437h288.597zM473.216 318.208c106.837 0 193.92 86.955 193.92 194.048 0 106.923-87.040 194.091-193.92 194.091s-193.963-87.168-193.963-194.091c0-107.093 87.083-194.048 193.963-194.048zM473.216 395.861c-64.213 0-116.352 52.181-116.352 116.395 0 64.256 52.139 116.437 116.352 116.437 64.171 0 116.352-52.181 116.352-116.437 0-64.213-52.181-116.437-116.352-116.437z"></path>
-                                        </svg>}
-                                    </button>
-                                ))}
-                            </div>
-                            <button className={`mx-1 w-[auto] bg-blue-400 hover:text-blue-400 border-blue-400  active:text-blue-600 space-x-3 font-semibold px-5  p-2 border-2 hover:bg-transparent rounded-md text-white capitalize`} onClick={removeImg}>Remove Image</button>
-                        </Box>
                         <Divider />
                         <Box
                             d="flex"

@@ -1,5 +1,7 @@
 import { Avatar } from "@chakra-ui/avatar";
+import { Box } from "@chakra-ui/react";
 import { Tooltip } from "@chakra-ui/tooltip";
+import { useSelector } from "react-redux";
 import ScrollableFeed from "react-scrollable-feed";
 import {
     isLastMessage,
@@ -7,45 +9,35 @@ import {
     isSameSenderMargin,
     isSameUser,
 } from "./Miscellaneous/ChatLogic";
+import SafetyModel from "./Miscellaneous/SafetyModel";
 // import { ChatState } from "../Context/ChatProvider";
 
-const ScrollableChat = ({ messages }) => {
+const ScrollableChat = () => {
     // const { user } = ChatState();
-    const user = { _id: 123, name: "Yogesh  Balodi", email: "yogeshbalodi1001@gmail.com", phone: { isPhone: false, phone: 8368616227 }, pic: "" }
+    const { messages } = useSelector((state) => state.messages);
+    const { user } = useSelector((state) => state.user);
     return (
         <ScrollableFeed className="scrollbar-hide">
-            {messages &&
-                messages.map((m, i) => (
-                    <div style={{ display: "flex" }} key={m._id}>
-                        {/* {(isSameSender(messages, m, i, user._id) ||
-                            isLastMessage(messages, i, user._id)) && (
-                                <Tooltip label={m.sender.name} placement="bottom-start" hasArrow>
-                                    <Avatar
-                                        mt="7px"
-                                        mr={1}
-                                        size="sm"
-                                        cursor="pointer"
-                                        name={m.sender.name}
-                                        src={m.sender.pic}
-                                    />
-                                </Tooltip>
-                            )} */}
+            {messages.length ?
+                messages.map((obj, i) => (
+                    <div style={{ display: "flex" }} key={obj._id}>
                         <span
                             style={{
-                                backgroundColor: `${m.sender._id === user._id ? "#00a884" : "#54656f"
+                                backgroundColor: `${obj.sender._id === user._id ? "#1C7516" : "#54656f"
                                     }`,
                                 color: "white",
-                                marginLeft: isSameSenderMargin(messages, m, i, user._id),
-                                marginTop: isSameUser(messages, m, i, user._id) ? 3 : 10,
+                                marginLeft: isSameSenderMargin(messages, obj, i, user._id),
+                                marginTop: isSameUser(messages, obj, i, user._id) ? 8 : 12,
                                 borderRadius: "10px",
                                 padding: "5px 15px",
                                 maxWidth: "75%",
                             }}
                         >
-                            {m.content}
+                            {obj.content}
                         </span>
                     </div>
-                ))}
+                )) :
+                <SafetyModel flag={true} />}
         </ScrollableFeed>
     );
 };

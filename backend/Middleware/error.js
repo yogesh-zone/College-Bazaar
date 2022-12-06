@@ -32,6 +32,6 @@ module.exports = (err, req, res, next) => {
   // sending response to frontend
   res.status(err.statusCode).json({
     success: false,
-    message: err.message,
+    error: err.message,
   });
 };

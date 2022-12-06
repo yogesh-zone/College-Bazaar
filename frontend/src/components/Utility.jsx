@@ -1,9 +1,14 @@
 import React from 'react'
 import Helmet from "react-helmet";
-import { Avatar, Menu, MenuButton, MenuDivider, MenuItem, MenuList, MenuOptionGroup } from '@chakra-ui/react'
+import { Avatar, Menu, MenuButton, MenuDivider, MenuItem, MenuList, MenuOptionGroup, Toast, useToast } from '@chakra-ui/react'
 import { FiLogOut, FiSettings } from 'react-icons/fi'
 import { MdOutlineAccountCircle, MdOutlineSell } from 'react-icons/md'
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from "react-redux"
+import { logoutUser } from '../actions/userActions';
+
 export const link = [
     { name: "Home", link: "/" },
     { name: "About Us", link: "/about" },
@@ -11,29 +16,54 @@ export const link = [
     { name: "Chats", link: "/chats" }
 ]
 export const AvatarIcon = () => {
+    const { user } = useSelector(
+        (state) => state.user
+    );
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const toast = useToast();
+    const logout = () => {
+        dispatch(logoutUser());
+        toast({
+            title: "logout Successful",
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+            position: "bottom",
+        });
+        navigate('/');
+    }
+    useEffect(() => {
+        if (!user) {
+
+        }
+    }, [user])
     return (
-        <Menu isLazy>
-            <MenuButton>
-                <Avatar size='md' src="https://res.cloudinary.com/dbej3vdgp/image/upload/v1664949454/College%20Bazaar/cjeindbi6pndzursg5ir.jpg"></Avatar>
-            </MenuButton>
-            <MenuList color={'black'}>
-                <MenuOptionGroup defaultValue='asc' title='Name of the user' type='radio'>
-                    <MenuDivider />
-                    <MenuItem icon={<MdOutlineAccountCircle className='text-lg' />}>
-                        My Account
-                    </MenuItem>
-                    <MenuItem icon={<MdOutlineSell className='text-lg' />} display='flex' justifyContent={'center'}>
-                        My Ads
-                    </MenuItem>
-                    <MenuItem icon={<FiSettings className='text-lg' />}>
-                        Setting
-                    </MenuItem>
-                    <MenuItem icon={<FiLogOut className='text-lg' />}>
-                        Logout
-                    </MenuItem>
-                </MenuOptionGroup>
-            </MenuList>
-        </Menu>)
+        <>
+            {<Menu isLazy>
+                <MenuButton>
+                    <Avatar size='md' src={user && user.avatar.url}></Avatar>
+                </MenuButton>
+                <MenuList color={'black'}>
+                    <MenuOptionGroup defaultValue='asc' title={user.name} type='radio'>
+                        <MenuDivider />
+                        <MenuItem onClick={() => navigate('/me')} icon={<MdOutlineAccountCircle className='text-lg' />}>
+                            My Account
+                        </MenuItem>
+                        <MenuItem onClick={() => navigate('/me')} icon={<MdOutlineSell className='text-lg' />} display='flex' justifyContent={'center'}>
+                            My Ads
+                        </MenuItem>
+                        <MenuItem onClick={() => navigate('/changePassword')} icon={<FiSettings className='text-lg' />}>
+                            Setting
+                        </MenuItem>
+                        <MenuItem icon={<FiLogOut className='text-lg' />} onClick={() => logout()}>
+                            Logout
+                        </MenuItem>
+                    </MenuOptionGroup>
+                </MenuList>
+            </Menu>}
+        </>
+    )
 }
 
 //metaData

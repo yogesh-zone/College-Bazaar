@@ -7,18 +7,21 @@ import React, { useState } from 'react'
 import { AvatarIcon, link } from "../Utility";
 import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useSelector } from "react-redux"
 function Navbar() {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [active, setActive] = useState("");
-    const [user, setUser] = useState(false);
+
+    const { user } = useSelector(
+        (state) => state.user
+    );
     const navigate = useNavigate();
-    useEffect(() => {
-        // setUser(!user);
-    }, [active, user])
     const handleSmNav = (name) => {
         setActive(name);
         onClose();
     }
+
+    console.log("user is ", user);
     return (
         <div className="bg-[#242e34] text-white py-2 px-1 flex justify-between items-center h-[12vh] lg:sticky top-0 z-50">
             {/* nav part 1 -> logo part 2 -> name part 3 -> links  */}
@@ -89,7 +92,7 @@ function Navbar() {
                         <IoChatbubbleEllipsesOutline className='text-2xl' />
                     </Link>
                     <div className=''>
-                        <AvatarIcon />
+                        <AvatarIcon user={user} />
                     </div>
                 </div>}
 
@@ -106,7 +109,9 @@ function Navbar() {
 
                 <div className='flex justify-around w-[80%] sm:justify-around items-center space-x-3 lg:w-auto lg:hidden'>
                     {user && <div className=''>
-                        <AvatarIcon />
+                        <AvatarIcon user={user} />
+
+                        {/* {AvatarIcon(user, setUser)} */}
                     </div>}
                     {/* <div className="flex justify-center items-center cursor-pointer px-2 w-[40%] md:w-[30%] rounded-lg bg-gray-300 text-slate-700 lg:hidden"> */}
                     <MdMenu className='scale-[250%] bg-white text-black rounded-sm' onClick={onOpen} />

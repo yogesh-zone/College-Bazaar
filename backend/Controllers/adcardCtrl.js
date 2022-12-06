@@ -110,20 +110,22 @@
 
 const Ad = require("../DBmodels/adModel");
 const ApiFetchure = require("../Utils/apiFetch");
-const ErrorHandler = require("../Middleware/error");
+const ErrorHandler = require("../Utils/errorHandler");
 const adCtrl = {
   newAd: async (req, res) => {
     try {
+      console.log(req.body);
+
       const {
         name,
         description,
         Category,
         course,
         semester,
-        allImage,
         price,
-        city,
         state,
+        city,
+        images,
       } = req.body;
       const address = {
         city,
@@ -136,11 +138,12 @@ const adCtrl = {
         course,
         semester,
         price,
-        allImage,
+        images,
         user: req.user.id,
         address,
       });
       await newAd.save();
+      console.log(newAd);
       res.status(201).json({ message: "Ad has been created!" });
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
@@ -149,7 +152,9 @@ const adCtrl = {
 
   allAds: async (req, res, next) => {
     try {
-      let ads = Ad.find().populate("user", "name avatar");
+      let ads = Ad.find()
+        .populate("user", "name avatar")
+        .sort({ createdAt: -1 });
       const result = new ApiFetchure(ads, req.query).search().pagination(12);
       ads = await result.ads;
       return res.status(200).json({ ads });
@@ -158,10 +163,22 @@ const adCtrl = {
     }
   },
 
+  userAllAds: async (req, res, next) => {
+    try {
+      // const ads = await Ad.find({ user: { $elemMatch: { $eq: req.user.id } } });
+      const ads = await Ad.find({ user: req.user.id });
+      return res.status(200).json({ ads });
+    } catch (error) {
+      next(new ErrorHandler(error.message), 500);
+    }
+  },
+
   aAd: async (req, res, next) => {
     try {
       const { _id } = req.params;
-      const ad = await Ad.find({ _id }).populate("user", "name avatar");
+      const ad = await Ad.find({ _id })
+        .populate("user", "name avatar")
+        .sort({ createdAt: -1 });
       if (!ad) {
         return next(new ErrorHandler("Invalid Item!"), 400);
       }

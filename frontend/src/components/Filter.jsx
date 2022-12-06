@@ -98,7 +98,7 @@ function Filter() {
                     </div>
                 </form>
                 {queryLoading &&
-                    <div className='bg-white h-[35vh] overflow-hidden'>
+                    <div className=' h-[35vh] overflow-hidden'>
                         <ItemsLoading />
                     </div>}
             </div>
