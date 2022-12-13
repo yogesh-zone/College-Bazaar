@@ -88,6 +88,7 @@ const Login = () => {
                         onChange={(e) => setPassword(e.target.value)}
                         type={show ? "text" : "password"}
                         placeholder="Enter password"
+                        onKeyDown={(e) => e.key === "Enter" && submitHandler()}
                     />
                     <InputRightElement width="4.5rem">
                         <Button h="1.75rem" size="sm" onClick={handleClick}>

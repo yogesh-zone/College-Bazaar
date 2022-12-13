@@ -6,6 +6,7 @@ import Signup from '../components/Authentication/Signup';
 import { MetaData } from '../components/Utility';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from "react-redux"
+import Navbar from '../components/Layouts/Navbar';
 // import animationData from "../Animations/chatLoading.json"
 
 function LoginPage() {
@@ -28,7 +29,8 @@ function LoginPage() {
     }, []);
     return (
         <>
-            <MetaData title={"Login"} />
+            <MetaData title={"Sign in | College Bazaar"} />
+            <Navbar active={""} />
             <div className='bg-gray-600'>
                 <Container maxW="2xl" centerContent>
                     <Box

@@ -8,6 +8,8 @@ import animatinData2 from "../components/Animations/chatLoading.json";
 import Lottie from 'react-lottie';
 import { useEffect } from 'react';
 import { useSelector } from "react-redux"
+import { MetaData } from '../components/Utility';
+import Navbar from '../components/Layouts/Navbar';
 // import { ChatState } from "../Context/ChatProvider";
 
 const Chats = () => {
@@ -34,15 +36,34 @@ const Chats = () => {
         };
     }
     return (
-        <div style={{ width: "100%" }}>
-            {/*  SideDrawer -->  this is for header/navbar part and a sider drawer open when we click on search users */}
-            {/* {user && <SideDrawer />} */}
-            <Box display="flex" justifyContent="space-between" w="100%" h="82vh">
-                {/* MyChats -->  show left side of the chat means all users on chat (100% width uptill md and for lg it is on left side)*/}
-                {user && <MyChats />}
-                {/* params --->  fetchAgain={fetchAgain} */}
-                {user && selectedChat && <Chatbox />}
-                {!selectedChat && <Box
+        <>
+            <MetaData title={"Chats | College Bazaar"} />
+            <Navbar active={"Chats"} />
+            <div style={{ width: "100%" }}>
+                {/*  SideDrawer -->  this is for header/navbar part and a sider drawer open when we click on search users */}
+                {/* {user && <SideDrawer />} */}
+                <Box display="flex" justifyContent="space-between" w="100%" h="82vh">
+                    {/* MyChats -->  show left side of the chat means all users on chat (100% width uptill md and for lg it is on left side)*/}
+                    {user && <MyChats />}
+                    {/* params --->  fetchAgain={fetchAgain} */}
+                    {user && selectedChat && <Chatbox />}
+                    {!selectedChat && <Box
+                        display={{ base: "none", md: "flex" }}
+                        alignItems="center"
+                        flexDir="column"
+                        justifyContent='center'
+                        bg="white"
+                        w={{ base: "100%", md: "68%" }}
+                        borderRadius="lg"
+                        borderWidth="1px"
+                        overflow={"hidden"}
+                        background="gray.900"
+                    >
+                        <h2 className="text-white text-2xl font-semibold">No messages, yet ?</h2>
+                        <Lottie height={150} width={150} options={lottieOptions(animatinData2)} />
+                        <h2 className="text-white text-2xl font-semibold">click on a user to start chat</h2>
+                    </Box>}
+                    {/* {(user && selectedChat) ? <Chatbox selectedChat={selectedChat} setSelectedChat={setSelectedChat} /> : <Box
                     display={{ base: "none", md: "flex" }}
                     alignItems="center"
                     flexDir="column"
@@ -53,28 +74,13 @@ const Chats = () => {
                     borderWidth="1px"
                     overflow={"hidden"}
                     background="gray.900"
-                >
-                    <h2 className="text-white text-2xl font-semibold">No messages, yet ?</h2>
-                    <Lottie height={150} width={150} options={lottieOptions(animatinData2)} />
-                    <h2 className="text-white text-2xl font-semibold">click on a user to start chat</h2>
-                </Box>}
-                {/* {(user && selectedChat) ? <Chatbox selectedChat={selectedChat} setSelectedChat={setSelectedChat} /> : <Box
-                    display={{ base: "none", md: "flex" }}
-                    alignItems="center"
-                    flexDir="column"
-                    justifyContent='center'
-                    bg="white"
-                    w={{ base: "100%", md: "68%" }}
-                    borderRadius="lg"
-                    borderWidth="1px"
-                    overflow={"hidden"}
-                    background="gray.900"
-                >
+                    >
                     <Lottie height={150} width={150} options={lottieOptions(animatinData2)} />
                     <h2 className="text-white text-2xl font-semibold">click a user to start chat</h2>
                 </Box>} */}
-            </Box>
-        </div>
+                </Box>
+            </div>
+        </>
     );
 }
 

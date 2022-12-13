@@ -8,16 +8,16 @@ import { AvatarIcon, link } from "../Utility";
 import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from "react-redux"
-function Navbar() {
+function Navbar({ active }) {
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const [active, setActive] = useState("");
+    // const [active, setActive] = useState("Home");
 
     const { user } = useSelector(
         (state) => state.user
     );
     const navigate = useNavigate();
     const handleSmNav = (name) => {
-        setActive(name);
+        // setActive(name);
         onClose();
     }
 
@@ -40,7 +40,7 @@ function Navbar() {
                             key={obj.name}
                             className={`hover:text-slate-500 text-lg md:transition-all md:duration-100 ${obj.name === active ? "text-slate-500 font-semibold" : "block"
                                 }`}
-                            onClick={() => setActive(obj.name)}
+                        // onClick={() => setActive(obj.name)}
                         >
                             {obj.name}
                         </Link>
@@ -62,7 +62,10 @@ function Navbar() {
                         <MenuList color={'black'}>
                             <MenuOptionGroup defaultValue='asc' title='Notifications' type='radio'>
                                 <MenuDivider />
-                                <Link to="/chats" onClick={() => { setActive("Chats") }}>
+                                <MenuItem >
+                                    No New Notification
+                                </MenuItem>
+                                {/* <Link to="/chats" onClick={() => { setActive("Chats") }}>
                                     <MenuItem icon={<Avatar size='sm' src="https://res.cloudinary.com/dbej3vdgp/image/upload/v1664949454/College%20Bazaar/cjeindbi6pndzursg5ir.jpg"></Avatar>}>
                                         Yogesh Balodi
                                     </MenuItem>
@@ -84,11 +87,11 @@ function Navbar() {
                                     <MenuItem icon={<Avatar size='sm' src="https://res.cloudinary.com/dbej3vdgp/image/upload/v1664949454/College%20Bazaar/cjeindbi6pndzursg5ir.jpg"></Avatar>}>
                                         Vikas Kundra
                                     </MenuItem>
-                                </Link>
+                                </Link> */}
                             </MenuOptionGroup>
                         </MenuList>
                     </Menu>
-                    <Link to="/chats" onClick={() => { setActive("Chats") }} className="hover:scale-125 duration-150 ">
+                    <Link to="/chats" className="hover:scale-125 duration-150 ">
                         <IoChatbubbleEllipsesOutline className='text-2xl' />
                     </Link>
                     <div className=''>

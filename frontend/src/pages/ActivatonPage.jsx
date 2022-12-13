@@ -4,6 +4,9 @@ import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { REGISTER_USER_FAILS, REGISTER_USER_SUCCESS } from '../constants';
 import { useDispatch, useSelector } from 'react-redux';
+import { loadUser } from '../actions/userActions';
+import { MetaData } from '../components/Utility';
+import Navbar from '../components/Layouts/Navbar';
 
 export const ActivatonPage = () => {
     const { activation_token } = useParams();
@@ -21,6 +24,7 @@ export const ActivatonPage = () => {
             );
             console.log("user on auth page ", data);
             dispatch({ type: REGISTER_USER_SUCCESS, payload: data.user });
+            dispatch(loadUser());
             toast({
                 title: data.message,
                 status: "success",
@@ -49,7 +53,7 @@ export const ActivatonPage = () => {
     }
     useEffect(() => {
         if (isAuthenticated) {
-            console.log("auth vala")
+            console.log("auth vala");
             navigate('/');
         }
 
@@ -61,14 +65,19 @@ export const ActivatonPage = () => {
 
 
     return (
-        <div className='flex flex-col justify-center items-center  min-h-[250px]'>
-            {activation_token === ":activation_token" ?
-                <>
-                    <h2 className="text-2xl font-extabold tracking-tighter">An Activation Link is Sent to Your Email</h2>
-                    <h2 className="text-2xl font-extabold tracking-tighter">Please Check your Email</h2>
-                </> :
-                <><h2 className="text-2xl font-extabold tracking-tighter">We are Verifying your Account</h2>
-                    <h2 className="text-2xl font-extabold tracking-tighter">Please Wait.</h2></>}
-        </div>
+        <>
+            <MetaData title={"Activate Account | College Bazaar"} />
+            <Navbar active={""} />
+            <div className='flex flex-col justify-center items-center  min-h-[250px]'>
+
+                {activation_token === ":activation_token" ?
+                    <>
+                        <h2 className="text-2xl font-extabold tracking-tighter text-white">An Activation Link is Sent to Your Email</h2>
+                        <h2 className="text-2xl font-extabold tracking-tighter text-white">Please Check your Email</h2>
+                    </> :
+                    <><h2 className="text-2xl font-extabold tracking-tighter">We are Verifying your Account</h2>
+                        <h2 className="text-2xl font-extabold tracking-tighter">Please Wait.</h2></>}
+            </div>
+        </>
     )
 }

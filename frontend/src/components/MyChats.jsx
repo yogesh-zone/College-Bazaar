@@ -87,7 +87,7 @@ const MyChats = () => {
                 overflowY="hidden"
                 background={"gray.800"}
             >
-                {chats ? (
+                {chats.length != 0 ? (
                     <Stack overflowY="auto" gap={0} h={"100%"}>
                         {chats.map((chat) => (
                             <Box
@@ -121,7 +121,7 @@ const MyChats = () => {
                         ))}
                     </Stack>
                 ) : (<>
-                    <div className="p-2 text-2xl font-semibold h-[100%] flex items-center justify-center text-center text-white">No chats available</div>
+                    <div className="p-2 text-2xl font-semibold h-[100%] flex items-center justify-center text-center text-white">No chats found</div>
                 </>
                 )}
             </Box>}

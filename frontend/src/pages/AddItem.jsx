@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ButtonGhost, MetaData } from '../components/Utility'
 import ItemsLoading from '../components/Loading/ItemsLoading';
 import axios from "axios"
+import Navbar from '../components/Layouts/Navbar';
 
 function AddItem() {
     const [formData, setFormData] = useState({});
@@ -188,7 +189,8 @@ function AddItem() {
     }
     return (
         <>
-            <MetaData title={"Add Item"} />
+            <MetaData title={"Post Ad | College Bazaar"} />
+            <Navbar active={"Sell Item"} />
             <div className="bg-gray-600 h-auto overflow-auto">
                 <Container maxW="4xl" centerContent>
                     <Box

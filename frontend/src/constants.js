@@ -41,6 +41,7 @@ export const AN_ITEM_FAILS = "AN_ITEM_FAILS";
 // fetching all items
 export const ALL_ITEMS_REQUEST = "ALL_ITEMS_REQUEST";
 export const ALL_ITEMS_SUCCESS = "ALL_ITEMS_SUCCESS";
+export const ALL_FILTERS_SUCCESS = "ALL_FILTERS_SUCCESS";
 export const ALL_ITEMS_FAILS = "ALL_ITEMS_FAILS";
 
 // fetching selected chats

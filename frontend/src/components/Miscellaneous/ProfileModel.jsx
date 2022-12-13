@@ -24,7 +24,7 @@ const ProfileModal = ({ user, children }) => {
             {children ? (
                 <span onClick={onOpen}>{children}</span>
             ) : (
-                <Avatar display='flex' alt={user.name} src={user.avatar.url} size="md" onClick={onOpen}></Avatar>
+                <Avatar display='flex' cursor='pointer' alt={user.name} src={user.avatar.url} size="md" onClick={onOpen}></Avatar>
             )}
             <Modal size="lg" onClose={onClose} isOpen={isOpen} isCentered>
                 <ModalOverlay />

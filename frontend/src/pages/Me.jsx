@@ -4,6 +4,8 @@ import axios from "axios"
 import { useDispatch, useSelector } from "react-redux"
 import { clearErrors, loadUser, updateUser } from '../actions/userActions';
 import { useNavigate } from 'react-router-dom';
+import { MetaData } from '../components/Utility';
+import Navbar from '../components/Layouts/Navbar';
 function Me() {
     const { user, loding, error } = useSelector(
         (state) => state.user
@@ -95,6 +97,8 @@ function Me() {
     console.log("userr is ", user);
     return (
         <>
+            <MetaData title={"My Account | College Bazaar"} />
+            <Navbar active={""} />
             {user &&
                 <div className="bg-gray-800 text-white h-[100%] flex md:flex-row flex-col py-12 flex-wrap">
                     <div className="flex justify-center flex-col items-center mx-auto mb-2">

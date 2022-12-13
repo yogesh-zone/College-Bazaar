@@ -14,6 +14,8 @@ import { loadUser } from "./actions/userActions";
 import store from "./store";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import Item from "./pages/Item";
+import Aboutus from "./pages/Aboutus";
 function App() {
   const { user } = useSelector((state) => state.user);
   useEffect(() => {
@@ -22,12 +24,14 @@ function App() {
   return (
     <div className="h-screen bg-gray-800 overflow-auto justify-between flex flex-col">
       <div>
-        <Navbar />
+        {/* <Navbar /> */}
         <Routes>
           <Route exact path="/" element={<Home />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/addItem" element={<AddItem />} />
+          <Route path="/item/:id" element={<Item />} />
           <Route path="/chats" element={<Chats />} />
+          <Route path="/about" element={<Aboutus />} />
           <Route path="/me" element={<Me />} />
 
           <Route

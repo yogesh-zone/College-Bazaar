@@ -152,11 +152,13 @@ const adCtrl = {
 
   allAds: async (req, res, next) => {
     try {
-      let ads = Ad.find()
-        .populate("user", "name avatar")
-        .sort({ createdAt: -1 });
-      const result = new ApiFetchure(ads, req.query).search().pagination(12);
+      let ads = Ad.find().sort({ createdAt: -1 });
+      // .populate("user", "name avatar")
+      const result = new ApiFetchure(ads, req.query).search().pagination(8);
       ads = await result.ads;
+      if (ads == []) {
+        return next(new ErrorHandler("Ads not found"));
+      }
       return res.status(200).json({ ads });
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
@@ -177,7 +179,7 @@ const adCtrl = {
     try {
       const { _id } = req.params;
       const ad = await Ad.find({ _id })
-        .populate("user", "name avatar")
+        .populate("user", "name avatar email phone")
         .sort({ createdAt: -1 });
       if (!ad) {
         return next(new ErrorHandler("Invalid Item!"), 400);

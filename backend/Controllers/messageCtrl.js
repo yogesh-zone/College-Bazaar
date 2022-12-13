@@ -10,9 +10,11 @@ const messageCtrl = {
       if (!chatId) {
         return res.status(400).json({ msg: "chatId not sent with params" });
       }
-      const message = await Message.find({ chat: chatId })
-        .populate("sender", "_id")
-        .select("sender content");
+      const message = await Message.find({ chat: chatId }).populate(
+        "sender",
+        "_id"
+      );
+      // .select("sender content");
 
       res.json({ msg: message });
     } catch (error) {
@@ -39,19 +41,19 @@ const messageCtrl = {
 
       let message = await Message.create(newMessage);
       message = await message.populate("sender", "_id");
-      // message = await message.populate("chat");
+      message = await message.populate("chat");
 
       // jo chat m users h [ {} {} ] sirf unki id hogi
-      // message = await User.populate(message, {
-      //   path: "chat.users",
-      //   select: "name avatar.url email",
-      // });
+      message = await User.populate(message, {
+        path: "chat.users",
+        select: "name avatar.url email",
+      });
       // so this find populate their name avatar and email with respect to their Ids
 
       await Chat.findByIdAndUpdate(chatId, { latestMessage: message });
-      return res.json({ msg: message });
+      return res.json({ message });
     } catch (error) {
-      return res.status(500).json({ msg: error.message });
+      return res.status(500).json({ error: error.message });
       // it returns but we need to change it.
       //   "msg": {
       //     "content": "hello this is first message from yogeshbalodi to yogilol",
