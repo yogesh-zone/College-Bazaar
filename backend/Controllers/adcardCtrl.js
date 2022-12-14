@@ -154,10 +154,10 @@ const adCtrl = {
     try {
       let ads = Ad.find().sort({ createdAt: -1 });
       // .populate("user", "name avatar")
-      const result = new ApiFetchure(ads, req.query).search().pagination(8);
+      const result = new ApiFetchure(ads, req.query).search().pagination(12);
       ads = await result.ads;
-      if (ads == []) {
-        return next(new ErrorHandler("Ads not found"));
+      if (ads.length === 0) {
+        return next(new ErrorHandler("No ads found"));
       }
       return res.status(200).json({ ads });
     } catch (error) {
@@ -169,6 +169,9 @@ const adCtrl = {
     try {
       // const ads = await Ad.find({ user: { $elemMatch: { $eq: req.user.id } } });
       const ads = await Ad.find({ user: req.user.id });
+      if (ads.length === 0) {
+        return next(new ErrorHandler("No ads found"));
+      }
       return res.status(200).json({ ads });
     } catch (error) {
       next(new ErrorHandler(error.message), 500);
@@ -181,10 +184,10 @@ const adCtrl = {
       const ad = await Ad.find({ _id })
         .populate("user", "name avatar email phone")
         .sort({ createdAt: -1 });
-      if (!ad) {
+      if (ad.length === 0) {
         return next(new ErrorHandler("Invalid Item!"), 400);
       }
-      res.status(200).json({ ad });
+      return res.status(200).json({ ad: ad[0] });
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
     }

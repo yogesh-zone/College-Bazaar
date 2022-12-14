@@ -203,7 +203,7 @@ const userCtrl = {
       const isMatch = await user.comparePassword(oldPassword);
 
       if (!isMatch) {
-        next(new ErrorHandler("Old Password is incorrect.", 400));
+        return next(new ErrorHandler("Old Password is incorrect.", 400));
       }
       passwordHash = await bcrypt.hash(newPassword, 12);
       user.password = passwordHash;

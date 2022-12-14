@@ -1,6 +1,7 @@
 import React from 'react'
 import Lottie from 'react-lottie';
-import animationData from "../Animations/404.json";
+import { Link } from 'react-router-dom';
+import animationData from "../Animations/4044.json";
 function DefaultLoading() {
     const defaultOptions = {
         loop: true,
@@ -12,16 +13,19 @@ function DefaultLoading() {
     };
     return (
         <>
-            <div className='mx-auto mt-[15vh] lg:mt-[6vh] text-center lg:h-[72vh] w-[80%] lg:w-[55%]'>
-                <Lottie
-                    options={defaultOptions}
-                    height={"70%"}
-                    isClickToPauseDisabled={true}
-                    width={"70%"}
-                    style={{ position: "relative", cursor: "default" }}
-                // style={{ mx: "auto", paddingTop: "10vh", overflow: "auto", cursor: "default" }}
-                />
-                <h1 className="text-4xl font-bold text-slate-800">Page Not Found!</h1>
+
+            <div className=" bg-white h-full flex flex-col justify-center items-center w-full absolute top-0">
+                <div className='p-2 text-center '>
+                    <Lottie
+                        options={defaultOptions}
+                        height={"50%"}
+                        isClickToPauseDisabled={true}
+                        width={"100%"}
+                        style={{ position: "relative", cursor: "default" }}
+                    />
+                    <h1 className="text-4xl font-bold text-gray-700">Page Not Found!</h1>
+                    <Link to='/' className="text-xl font-bold text-blue-600">Click here to redirect</Link>
+                </div>
             </div>
         </>
     )

@@ -15,41 +15,36 @@ import { allChats, selecetedChat } from "../actions/chatAction";
 
 const MyChats = () => {
 
-    // const [selectedChat, setSelectedChat] = useState([]);
-    // const [chats, setChats] = useState([]);
-    // const selectedChat = { latestMessage: { sender: { name: "Yogesh Balodi" }, content: "hello yogesh how are you i am fine" }, _id: 8 };
-    const toast = useToast();
     const { user } = useSelector(
         (state) => state.user
     );
-    const dispatch = useDispatch();
     const { selectedChat } = useSelector((state) => state.chat);
-    const { chats, error } = useSelector((state) => state.chats);
+    const [chats, setChats] = useState([])
+    const [loading, setLoading] = useState(false);
     // fetch the latest msg from either of the user in room
     const fetchChats = async () => {
-        // console.log(user._id);
-        dispatch(allChats());
+        try {
+            const { data } = await axios.get("/api/chat");
+            setChats(data.chats);
+        } catch (error) {
+            toast({
+                title: "error",
+                status: "error",
+                description: error.response.data.error,
+                duration: 3000,
+                isClosable: true,
+                position: "bottom",
+            });
+        }
     };
+    const toast = useToast();
+    const dispatch = useDispatch();
     useEffect(() => {
-        console.log("under effect")
+        setLoading(true);
         fetchChats();
+        setLoading(false);
     }, [])
 
-    // useEffect(() => {
-    //     console.log("under effect chatss")
-    // }, [chats])
-
-
-    console.log("my chats ", selectedChat);
-
-
-    // const chats = [
-    //     { sender: "Yogesh Balodi", latestMessage: { sender: { name: "Yogesh Balodi" }, content: "hello yogesh how are you i am fine" }, _id: 123 },
-    //     { sender: "ABC Balodi", latestMessage: { sender: { name: "Yogesh Balodi" }, content: "hello yogesh how are you i am fine" }, _id: 4 },
-    //     { sender: "DEF Balodi", latestMessage: { sender: { name: "Yogesh Balodi" }, content: "hello yogesh how are you i am fine" }, _id: 5 },
-    //     { sender: "GFG Balodi", latestMessage: { sender: { name: "Yogesh Balodi" }, content: "hello yogesh how are you i am fine" }, _id: 6 },
-    //     { sender: "Leet Code", _id: 6 },
-    // ]
     return (
         <Box
             display={{ base: selectedChat ? "none" : "flex", md: "flex" }}

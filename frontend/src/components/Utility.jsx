@@ -50,7 +50,7 @@ export const AvatarIcon = () => {
                         <MenuItem onClick={() => navigate('/me')} icon={<MdOutlineAccountCircle className='text-lg' />}>
                             My Account
                         </MenuItem>
-                        <MenuItem onClick={() => navigate('/me')} icon={<MdOutlineSell className='text-lg' />} display='flex' justifyContent={'center'}>
+                        <MenuItem onClick={() => navigate('/myads')} icon={<MdOutlineSell className='text-lg' />} display='flex' justifyContent={'center'}>
                             My Ads
                         </MenuItem>
                         <MenuItem onClick={() => navigate('/changePassword')} icon={<FiSettings className='text-lg' />}>

@@ -28,24 +28,3 @@ export const selecetedChat =
       });
     }
   };
-
-export const allChats = () => async (dispatch) => {
-  try {
-    dispatch({ type: ALL_CHATS_REQUEST });
-    const { data } = await axios.get("/api/chat");
-    console.log("chats ", data.chats);
-    dispatch({ type: ALL_CHATS_SUCCESS, payload: data.chats });
-  } catch (error) {
-    dispatch({ type: ALL_CHATS_FAILS, payload: error.response.data.error });
-  }
-};
-
-export const allMessages = (chatId) => async (dispatch) => {
-  try {
-    dispatch({ type: MESSAGE_REQUEST });
-    const { data } = await axios.get(`/api/message/all/${chatId}`);
-    dispatch({ type: MESSAGE_SUCCESS, payload: data.msg });
-  } catch (error) {
-    dispatch({ type: MESSAGE_FAILS, payload: error.response.data.error });
-  }
-};

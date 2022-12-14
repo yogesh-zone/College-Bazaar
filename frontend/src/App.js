@@ -8,6 +8,7 @@ import animationData from "./components/Animations/404.json";
 import AddItem from "./pages/AddItem";
 import Footer from "./components/Layouts/Footer";
 import Chats from "./pages/Chats";
+import MyAds from "./pages/MyAds";
 import { ActivatonPage } from "./pages/ActivatonPage";
 import Me from "./pages/Me";
 import { loadUser } from "./actions/userActions";
@@ -16,6 +17,7 @@ import axios from "axios";
 import { useSelector } from "react-redux";
 import Item from "./pages/Item";
 import Aboutus from "./pages/Aboutus";
+import ResetPassword from "./pages/ResetPassword";
 function App() {
   const { user } = useSelector((state) => state.user);
   useEffect(() => {
@@ -33,6 +35,8 @@ function App() {
           <Route path="/chats" element={<Chats />} />
           <Route path="/about" element={<Aboutus />} />
           <Route path="/me" element={<Me />} />
+          <Route path="/myads" element={<MyAds />} />
+          <Route path="/changePassword" element={<ResetPassword />} />
 
           <Route
             path="/user/activate/:activation_token"
