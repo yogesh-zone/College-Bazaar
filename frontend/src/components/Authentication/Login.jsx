@@ -91,7 +91,7 @@ const Login = () => {
                         onKeyDown={(e) => e.key === "Enter" && submitHandler()}
                     />
                     <InputRightElement width="4.5rem">
-                        <Button h="1.75rem" size="sm" onClick={handleClick}>
+                        <Button colorScheme='none' h="1.75rem" size="sm" onClick={handleClick}>
                             {show ? "Hide" : "Show"}
                         </Button>
                     </InputRightElement>
@@ -106,20 +106,21 @@ const Login = () => {
             >
                 Login
             </Button>
-            <div>
+            {/* <div>
                 or
             </div>
             <Button
                 variant="solid"
-                colorScheme="gray"
+                colorScheme='gray'
+                color='black'
                 width="100%"
                 display="flex"
                 justifyContent="start"
             >
                 <FcGoogle />
                 <p className="ml- mx-auto">Google</p>
-            </Button>
-            <div>Forgot password ? <a href="/forgot" className="text-blue-600">Click Here</a></div>
+            </Button> */}
+            <div>Forgot password ? <a href="/forgot" className="text-blue-400">Click Here</a></div>
         </VStack>
     );
 };

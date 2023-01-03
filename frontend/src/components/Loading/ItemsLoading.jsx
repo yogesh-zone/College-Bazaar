@@ -1,20 +1,14 @@
 import React from 'react'
-import animationData from "../Animations/itemsLoading.json";
+import animationData from "../Animations/defaultLoading2.json";
 import Lottie from 'react-lottie';
+import { lottieOptions } from '../Utility'
 function ItemsLoading() {
-    const defaultOptions = {
-        loop: true,
-        autoplay: true,
-        animationData: animationData,
-        rendererSettings: {
-            preserveAspectRatio: "xMidYMid slice",
-        },
-    };
     return (
         <>
             <Lottie
-                options={defaultOptions}
-                width={"100%"}
+                options={lottieOptions(animationData)}
+                width={150}
+                height={150}
                 isClickToPauseDisabled={true}
                 style={{ cursor: "default" }}
             />

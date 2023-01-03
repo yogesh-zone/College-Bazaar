@@ -34,7 +34,10 @@ const adSchema = mongoose.Schema(
       type: Number,
       require: [true, "Please set a price"],
     },
-
+    verified: {
+      type: Boolean,
+      default: false,
+    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

@@ -141,23 +141,25 @@ const SingleChat = () => {
 
     return (
         <>
-            <Box
-                display="flex"
-                flexDir="column"
-                justifyContent="flex-end"
-                p={3}
-                w="100%"
-                h="85%"
-                borderRadius="lg"
-                overflowY="hidden"
+            <div
+                className="flex flex-col mt-20 justify-end w-[100%] h-[91%] md:h-[87%] rounded-lg overflow-hidden"
+            // display="flex"
+            // flexDir="column"
+            // justifyContent="flex-end"
+            // p={3}
+            // w="100%"
+            // h="91%"
+            // background="blue"
+            // borderRadius="lg"
+            // overflowY="hidden"
             >
                 {loading ?
                     <div className=" h-auto my-auto flex justify-center">
                         <Lottie speed={5} height={150} width={150} options={lottieOptions(animationData)} />
                     </div>
                     :
-                    <>
-                        {messages.length ? <div className="messages mb-3 flex flex-col overflow-y-scroll scrollbar-hide">
+                    <div className=" h-full overflow-auto">
+                        {messages.length ? <div className="messages mb-3 flex h-[85%] md:h-[82%]  flex-col overflow-y-scroll scrollbar-hide">
                             <ScrollableChat messages={messages} isTyping={istyping} />
                             {/* {istyping && <div>
                                 <Lottie
@@ -169,19 +171,19 @@ const SingleChat = () => {
                                 />
                             </div>} */}
                         </div> : <SafetyModel flag={true} />}
-                    </>
+                        <div
+                            onKeyDown={sendMessage}
+                            isRequired
+                            className=" flex flex-col items-center gap-3 h-[20%] md:h-auto"
+                        >
+                            <input type="text" value={newMessage} onChange={typingHandler} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Enter a message.."></input>
+                            <h1 className="text-3xl md:hidden text-white">College Bazaar</h1>
+                        </div>
+                    </div>
 
                 }
-                <FormControl
-                    onKeyDown={sendMessage}
-                    isRequired
-                    mt={3}
 
-                >
-
-                    <input type="text" value={newMessage} onChange={typingHandler} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Enter a message.."></input>
-                </FormControl>
-            </Box>
+            </div>
         </>
     );
 };

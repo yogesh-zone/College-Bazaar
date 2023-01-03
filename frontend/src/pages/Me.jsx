@@ -79,7 +79,7 @@ function Me() {
             setName(user.name);
             setPhone(user.phone.phone);
             setShowPhone(user.phone.showPhone);
-            setAvatarPreview(user.avatar.url)
+            setAvatarPreview(user.avatar.url);
         }
 
         if (error) {

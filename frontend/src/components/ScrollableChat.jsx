@@ -27,7 +27,7 @@ const ScrollableChat = ({ messages, isTyping }) => {
         },
     };
     return (
-        <ScrollableFeed className="scrollbar-hide">
+        <ScrollableFeed className="scrollbar-hide p-2">
             {messages.length ?
                 <>
                     {messages.map((obj, i) => (

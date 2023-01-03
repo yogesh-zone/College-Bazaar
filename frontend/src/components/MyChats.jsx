@@ -1,6 +1,6 @@
 import { AddIcon } from "@chakra-ui/icons";
 import { Box, Stack, Text } from "@chakra-ui/layout";
-import { Avatar } from "@chakra-ui/react";
+import { Avatar, SkeletonCircle, SkeletonText } from "@chakra-ui/react";
 import { useToast } from "@chakra-ui/toast";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -54,8 +54,10 @@ const MyChats = () => {
             overflow={'hidden'}
             bg="white"
             w={{ base: "100%", md: "32%" }}
-            borderRadius="lg"
-            borderWidth="1px"
+            // borderRadius="lg"
+            // borderWidth="1px"
+            borderRight='1px'
+            borderColor='white'
             background="gray.900"
         >
             <Box
@@ -72,54 +74,70 @@ const MyChats = () => {
             >
                 <Text>My Chats</Text>
             </Box>
-            {chats && <Box
-                display="flex"
-                flexDir="column"
-                p={2}
-                bg="#F8F8F8"
-                w="100%"
-                h="100%"
-                overflowY="hidden"
-                background={"gray.800"}
-            >
-                {chats.length != 0 ? (
-                    <Stack overflowY="auto" gap={0} h={"100%"}>
-                        {chats.map((chat) => (
-                            <Box
-                                onClick={() => dispatch(selecetedChat(chat))}
-                                cursor="pointer"
-                                display="flex"
-                                borderRadius="lg"
-                                justifyContent="between"
-                                // alignItems={'center'}
-                                bg={(selectedChat && selectedChat._id === chat._id) ? "gray.800" : "gray.700"}
-                                color={(selectedChat && selectedChat._id === chat._id) ? "white" : "white"}
-                                _hover={{ bg: "gray.800" }}
-                                p={2}
-                                key={chat._id}
-                            >
-                                <Avatar size="md" src={getSenderImg(user, chat.users)}></Avatar>
-                                <Box px={2}>
-                                    <Text className="capitalize font-semibold">
-                                        {getSender(user, chat.users)}
-                                    </Text>
-                                    {chat.latestMessage && (
-                                        <Text fontSize="xs">
-                                            <span className="font-medium">{chat.latestMessage.sender.name}</span> :
-                                            {chat.latestMessage.content.length > 25
-                                                ? chat.latestMessage.content.substring(0, 25) + "..."
-                                                : chat.latestMessage.content}
-                                        </Text>
-                                    )}
-                                </Box>
-                            </Box>
-                        ))}
-                    </Stack>
-                ) : (<>
-                    <div className="p-2 text-2xl font-semibold h-[100%] flex items-center justify-center text-center text-white">No chats found</div>
-                </>
-                )}
-            </Box>}
+            {loading ?
+                <div className="text-3xl h-full w-full overflow-auto flex flex-col gap-1">
+                    {Array(20).fill(' ').map((_, i) => (
+                        <div className=" w-full gap-3 flex items-center p-3 bg-gray-600">
+                            <div className="">
+                                <SkeletonCircle size='10' />
+                            </div>
+                            <div className="flex-1">
+                                <SkeletonText noOfLines={2} spacing='4' skeletonHeight='2' />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+                : <>
+                    {chats && <Box
+                        display="flex"
+                        flexDir="column"
+                        // p={2}
+                        bg="#F8F8F8"
+                        w="100%"
+                        h="100%"
+                        overflowY="hidden"
+                        background={"gray.800"}
+                    >
+                        {chats.length != 0 ? (
+                            <Stack overflowY="auto" h={"100%"}>
+                                {chats.map((chat) => (
+                                    <Box
+                                        onClick={() => dispatch(selecetedChat(chat))}
+                                        cursor="pointer"
+                                        display="flex"
+                                        // borderRadius="lg"
+                                        justifyContent="between"
+                                        // alignItems={'center'}
+                                        bg={(selectedChat && selectedChat._id === chat._id) ? "gray.800" : "gray.700"}
+                                        color={(selectedChat && selectedChat._id === chat._id) ? "white" : "white"}
+                                        _hover={{ bg: "gray.800" }}
+                                        p={3}
+                                        key={chat._id}
+                                    >
+                                        <Avatar size="md" src={getSenderImg(user, chat.users)}></Avatar>
+                                        <Box px={2}>
+                                            <Text className="capitalize font-semibold">
+                                                {getSender(user, chat.users)}
+                                            </Text>
+                                            {chat.latestMessage && (
+                                                <Text fontSize="xs">
+                                                    <span className="font-medium">{chat.latestMessage.sender.name}</span> :
+                                                    {chat.latestMessage.content.length > 25
+                                                        ? chat.latestMessage.content.substring(0, 25) + "..."
+                                                        : chat.latestMessage.content}
+                                                </Text>
+                                            )}
+                                        </Box>
+                                    </Box>
+                                ))}
+                            </Stack>
+                        ) : (<>
+                            <div className="p-2 text-2xl font-semibold h-[100%] flex items-center justify-center text-center text-white">No chats found</div>
+                        </>
+                        )}
+                    </Box>}
+                </>}
+
 
         </Box >
     );

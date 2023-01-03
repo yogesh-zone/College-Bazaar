@@ -1,7 +1,7 @@
 const app = require("./app");
 const dotenv = require("dotenv");
 const connectDB = require("./Config/database");
-
+// var mail = require("./Config/sendMailDummy")();
 // if app on development then use config we defined here
 if (process.env.NODE_ENV !== "PRODUCTION") {
   dotenv.config({ path: "./backend/Config/config.env" });
@@ -55,3 +55,5 @@ io.on("connection", (socket) => {
     socket.leave(userData._id);
   });
 });
+
+// mail.send();

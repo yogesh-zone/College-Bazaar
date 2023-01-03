@@ -90,9 +90,10 @@ const Signup = () => {
 
     return (
         <VStack spacing="5px">
-            <Button
+            {/* <Button
                 variant="solid"
                 colorScheme="gray"
+                color='black'
                 width="100%"
                 display="flex"
                 justifyContent="start"
@@ -102,7 +103,7 @@ const Signup = () => {
             </Button>
             <div>
                 or
-            </div>
+            </div> */}
             <FormControl id="first-name" isRequired>
                 <FormLabel>Name</FormLabel>
                 <Input
@@ -127,7 +128,7 @@ const Signup = () => {
                         onChange={(e) => setPassword(e.target.value)}
                     />
                     <InputRightElement width="4.5rem">
-                        <Button h="1.75rem" size="sm" onClick={handleClick}>
+                        <Button colorScheme='none' h="1.75rem" size="sm" onClick={handleClick}>
                             {show ? "Hide" : "Show"}
                         </Button>
                     </InputRightElement>
@@ -137,15 +138,10 @@ const Signup = () => {
                 <FormLabel>Confirm Password</FormLabel>
                 <InputGroup size="md">
                     <Input
-                        type={show ? "text" : "password"}
+                        type='text'
                         placeholder="Confirm password"
                         onChange={(e) => setConfirmpassword(e.target.value)}
                     />
-                    <InputRightElement width="4.5rem">
-                        <Button h="1.75rem" size="sm" onClick={handleClick}>
-                            {show ? "Hide" : "Show"}
-                        </Button>
-                    </InputRightElement>
                 </InputGroup>
             </FormControl>
             <FormControl id="phone" isRequired>
@@ -155,7 +151,7 @@ const Signup = () => {
                     type="number"
                     onChange={(e) => setPhone(e.target.value)}
                 />
-                <Checkbox value={showPhone} borderColor="black" colorScheme='green' onChange={(e) => setShowPhone(!showPhone)}>
+                <Checkbox value={showPhone} mt={1} borderColor="white" colorScheme='green' onChange={(e) => setShowPhone(!showPhone)}>
                     Show phone number to other users
                 </Checkbox>
             </FormControl>

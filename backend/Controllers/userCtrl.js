@@ -1,4 +1,7 @@
 const User = require("../DBmodels/userModel");
+const Ad = require("../DBmodels/adModel");
+const Chat = require("../DBmodels/chatModel");
+const Messages = require("../DBmodels/messageModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const sendMail = require("../Utils/sendMail");
@@ -210,8 +213,8 @@ const userCtrl = {
       await user.save();
 
       return res.status(201).json({ msg: "Password changed successfully!" });
-    } catch (err) {
-      res.json({ msg: err.message });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
     }
   },
 
@@ -223,7 +226,7 @@ const userCtrl = {
       }
       res.json({ msg: user });
     } catch (error) {
-      return res.status(500).json(error.message);
+      return next(new ErrorHandler(error.message, 500));
     }
   },
 
@@ -241,10 +244,16 @@ const userCtrl = {
 
   getUsersAllInfor: async (req, res, next) => {
     try {
-      const user = await User.find();
+      const { name } = req.body;
+      const user = await User.find({
+        ...{ name: { $regex: name, $options: "i" } },
+      });
+      if (user.length === 0) {
+        return next(new ErrorHandler("No user found", 400));
+      }
       res.json({ user });
     } catch (error) {
-      return res.status(500).json(error.message);
+      return next(new ErrorHandler(error.message, 500));
     }
   },
 
@@ -253,7 +262,7 @@ const userCtrl = {
       res.clearCookie("jwtToken");
       return res.status(200).json({ message: "User Logged out." });
     } catch (error) {
-      return res.status(500).json(error.message);
+      return next(new ErrorHandler(error.message, 500));
     }
   },
 
@@ -280,36 +289,52 @@ const userCtrl = {
   updateUserRole: async (req, res, next) => {
     try {
       const { id } = req.params;
-      const { role } = req.body;
       const user = await User.findById(id).select("+role");
       if (!user) {
-        return res.status(400).json({ msg: "Invalid user" });
+        return next(new ErrorHandler("Invalid User", 500));
       }
-      user.role = role;
+      user.role = user.role ? 0 : 1;
       user.save();
-      return res.json({ msg: "Update success!" });
-    } catch (err) {
-      return res.status(500).json({ msg: err.message });
-      return res.status(500).json({ msg: err.message });
+      return res.json({ message: "Update success!" });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
     }
   },
 
   deleteUser: async (req, res, next) => {
     try {
       const { id } = req.params;
-      const { role } = req.body;
       const user = await User.findById(id);
       if (!user) {
-        return res.status(400).json({ msg: "Invalid user" });
+        return next(new ErrorHandler("Invalid User", 500));
       }
       const imgId = user.avatar.public_id;
       if (imgId) {
         await cloudinary.v2.uploader.destroy(imgId);
       }
+      let ads = await Ad.find({ user: user._id });
+      let chats = await Chat.find({
+        users: { $elemMatch: { $eq: user._id } },
+      });
+      for (i in ads) {
+        let ad = ads[i];
+        console.log("Item under Proccess", "\n\n\n");
+        for (j in ad.images) {
+          const imgId = ad.images[j].public_id;
+          await cloudinary.v2.uploader.destroy(imgId);
+        }
+        await ad.remove();
+        console.log("Item has been removed", "\n\n\n");
+      }
+      for (let i in chats) {
+        let chat = chats[i];
+        await Messages.deleteMany({ chat: chat._id });
+        await chat.remove();
+      }
       user.remove();
       return res.json({ msg: "delete success!" });
-    } catch (err) {
-      return res.status(500).json({ msg: err.message });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
     }
   },
 

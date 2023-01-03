@@ -111,6 +111,7 @@
 const Ad = require("../DBmodels/adModel");
 const ApiFetchure = require("../Utils/apiFetch");
 const ErrorHandler = require("../Utils/errorHandler");
+const cloudinary = require("../Utils/cloudinary");
 const adCtrl = {
   newAd: async (req, res) => {
     try {
@@ -154,12 +155,59 @@ const adCtrl = {
     try {
       let ads = Ad.find().sort({ createdAt: -1 });
       // .populate("user", "name avatar")
-      const result = new ApiFetchure(ads, req.query).search().pagination(12);
-      ads = await result.ads;
+      const result = new ApiFetchure(ads, req.query).search().pagination(8);
+      ads = await result.ads.find({ verified: true });
       if (ads.length === 0) {
         return next(new ErrorHandler("No ads found"));
       }
       return res.status(200).json({ ads });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+
+  adminAllAds: async (req, res, next) => {
+    try {
+      const { name } = req.body;
+      const ads = await Ad.find({
+        ...{ name: { $regex: name, $options: "i" }, verified: true },
+      })
+        .populate("user", "name")
+        .sort({ createdAt: -1 });
+      if (ads.length === 0) {
+        return next(new ErrorHandler("No ad found"));
+      }
+      return res.status(200).json({ ads });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+  adminVerificationAds: async (req, res, next) => {
+    try {
+      const ads = await Ad.find({
+        verified: false,
+      })
+        .populate("user", "name")
+        .sort({ createdAt: -1 });
+      if (ads.length === 0) {
+        return next(new ErrorHandler("No ad found"));
+      }
+      return res.status(200).json({ ads });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+
+  adminApproveAds: async (req, res, next) => {
+    try {
+      const { _id } = req.params;
+      const ad = await Ad.findById(_id);
+      if (!ad) {
+        return next(new ErrorHandler("Invalid Ad"));
+      }
+      ad.verified = true;
+      ad.save();
+      return res.status(200).json({ success: true });
     } catch (error) {
       return next(new ErrorHandler(error.message, 500));
     }
@@ -181,9 +229,10 @@ const adCtrl = {
   aAd: async (req, res, next) => {
     try {
       const { _id } = req.params;
-      const ad = await Ad.find({ _id })
-        .populate("user", "name avatar email phone")
-        .sort({ createdAt: -1 });
+      const ad = await Ad.find({ _id }).populate(
+        "user",
+        "name avatar email phone"
+      );
       if (ad.length === 0) {
         return next(new ErrorHandler("Invalid Item!"), 400);
       }
@@ -199,6 +248,10 @@ const adCtrl = {
       const item = await Ad.findOne({ _id });
       if (!item) {
         return next(new ErrorHandler("Invalid Item!"), 400);
+      }
+      for (i in item.images) {
+        const imgId = item.images[i].public_id;
+        await cloudinary.v2.uploader.destroy(imgId);
       }
       await item.remove();
       res.status(201).json({ message: "Delete success!" });
@@ -221,6 +274,10 @@ const adCtrl = {
             400
           )
         );
+      }
+      for (i in item.images) {
+        const imgId = item.images[i].public_id;
+        await cloudinary.v2.uploader.destroy(imgId);
       }
       await item.remove();
       res.status(201).json({ message: "Delete success!" });

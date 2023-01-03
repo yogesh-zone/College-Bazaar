@@ -11,6 +11,14 @@ router.post("/new", auth, adCtrl.newAd);
 router.delete("/delete/:_id", auth, adCtrl.deleteAd);
 
 router.delete("/admin/delete/:_id", auth, authAdmin, adCtrl.adminDeleteAd);
+router.post("/admin/all", auth, authAdmin, adCtrl.adminAllAds);
+router.get(
+  "/admin/underVerification",
+  auth,
+  authAdmin,
+  adCtrl.adminVerificationAds
+);
+router.put("/admin/approve/:_id", adCtrl.adminApproveAds);
 
 router.get("/all", adCtrl.allAds);
 

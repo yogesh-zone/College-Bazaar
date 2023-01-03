@@ -18,6 +18,7 @@ import { useSelector } from "react-redux";
 import Item from "./pages/Item";
 import Aboutus from "./pages/Aboutus";
 import ResetPassword from "./pages/ResetPassword";
+import DashBoard from "./pages/Dashboard";
 function App() {
   const { user } = useSelector((state) => state.user);
   useEffect(() => {
@@ -32,7 +33,11 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/addItem" element={<AddItem />} />
           <Route path="/item/:id" element={<Item />} />
-          <Route path="/chats" element={<Chats />} />
+
+          <Route
+            path="/chats"
+            element={user ? <Chats /> : <LoginPage showToast={true} />}
+          />
           <Route path="/about" element={<Aboutus />} />
           <Route path="/me" element={<Me />} />
           <Route path="/myads" element={<MyAds />} />
@@ -42,6 +47,9 @@ function App() {
             path="/user/activate/:activation_token"
             element={<ActivatonPage />}
           />
+          {user && user.role && (
+            <Route path="/Dashboard" element={<DashBoard />} />
+          )}
           <Route
             path="*"
             element={<DefaultLoading animationData={animationData} />}

@@ -69,9 +69,8 @@ const ProfileModal = ({ user, children }) => {
                         </Box>
 
                     </ModalBody>
-                    <ModalFooter display="flex" alignItems="center"
-                        justifyContent="space-between">
-                        <Link to="/" onClick={onClose}>More Info</Link>
+                    <ModalFooter display="flex" alignItems="end"
+                        justifyContent="end">
                         <Button colorScheme={'cyan'} onClick={onClose}>Close</Button>
                     </ModalFooter>
                 </ModalContent>

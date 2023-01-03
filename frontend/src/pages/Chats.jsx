@@ -10,21 +10,32 @@ import { useEffect } from 'react';
 import { useSelector } from "react-redux"
 import { MetaData } from '../components/Utility';
 import Navbar from '../components/Layouts/Navbar';
-// import { ChatState } from "../Context/ChatProvider";
+import { useToast } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
 
 const Chats = () => {
-    // const [fetchAgain, setFetchAgain] = useState(false);
-    // const { user } = ChatState();
-    // const [selectedChat, setSelectedChat] = useState(null);
-    //my own 
     const { user } = useSelector(
         (state) => state.user
     );
     const { selectedChat } = useSelector((state) => state.chat);
+    const toast = useToast();
+    const navigate = useNavigate();
 
-    useEffect(() => {
+    // useEffect(() => {
+    //     if (!user) {
+    //         // navigate('/login');
+    // toast({
+    //     title: "Please sign in to access resource",
+    //     status: "error",
+    //     duration: 3000,
+    //     isClosable: true,
+    //     position: "bottom",
+    // });
+    //         navigate('/login');
 
-    }, [selectedChat])
+    //     }
+    // })
+
     const lottieOptions = (animationData) => {
         return {
             loop: true,
@@ -38,11 +49,14 @@ const Chats = () => {
     return (
         <>
             <MetaData title={"Chats | College Bazaar"} />
-            <Navbar active={"Chats"} />
-            <div style={{ width: "100%" }}>
+            <div className={`${!selectedChat ? "block" : "hidden md:block"}`}>
+                <Navbar active={"Chats"} />
+            </div>
+            {/* <Navbar active={"Chats"} /> */}
+            <div className=''>
                 {/*  SideDrawer -->  this is for header/navbar part and a sider drawer open when we click on search users */}
                 {/* {user && <SideDrawer />} */}
-                <Box display="flex" justifyContent="space-between" w="100%" h="82vh">
+                <Box display="flex" justifyContent="space-between" w="100%" h={{ base: "100vh", md: "82vh" }}>
                     {/* MyChats -->  show left side of the chat means all users on chat (100% width uptill md and for lg it is on left side)*/}
                     {user && <MyChats />}
                     {/* params --->  fetchAgain={fetchAgain} */}
@@ -54,8 +68,8 @@ const Chats = () => {
                         justifyContent='center'
                         bg="white"
                         w={{ base: "100%", md: "68%" }}
-                        borderRadius="lg"
-                        borderWidth="1px"
+                        // borderRadius="lg"
+                        // borderWidth="1px"
                         overflow={"hidden"}
                         background="gray.900"
                     >

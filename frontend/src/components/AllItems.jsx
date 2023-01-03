@@ -1,4 +1,4 @@
-import { Box, Button, Image, useToast } from '@chakra-ui/react'
+import { Box, Button, Image, SkeletonText, useToast } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { useEffect } from 'react';
 import { AiOutlineSearch } from 'react-icons/ai'
@@ -16,7 +16,7 @@ function AllItems() {
     const [hideLoadButton, setHideLoadButton] = useState(false);
     const [page, SetPage] = useState(2);
     const toast = useToast();
-    let resultPerPage = 12;
+    let resultPerPage = 8;
     const fetchAds = async (isLoadMore = false) => {
         setLoading(true);
         try {
@@ -47,6 +47,7 @@ function AllItems() {
                 isClosable: true,
                 position: "bottom",
             });
+            setAds([])
             setHideLoadButton(true);
         }
         setLoading(false);
@@ -72,13 +73,13 @@ function AllItems() {
     }
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(name, course, semester, category);
-        setName("");
-        setCategory("All");
-        setSem(4);
-        setCourse("");
-        setSemester("");
-        console.log("handling submit form");
+        // console.log(name, course, semester, category);
+        // setName("");
+        // setCategory("All");
+        // setSem(4);
+        // setCourse("");
+        // setSemester("");
+        // console.log("handling submit form");
     }
     const navigate = useNavigate();
     useEffect(() => {
@@ -133,59 +134,93 @@ function AllItems() {
                             <option value="Electornics">Electornics</option>
                         </select>
                         <div className='mr-auto ml-2 lg:mr-0 md:ml-0 py-2 lg:py-0'>
-                            <Button type='submit' isLoading={loading} variant={"solid"} background="green.600" textColor={"white"} _hover={{ background: "green.700" }} _active={{ background: "green.900" }} rightIcon={<AiOutlineSearch />} onClick={fetchAds}>
+                            <Button type='submit' variant={"solid"} background="green.600" textColor={"white"} _hover={{ background: "green.700" }} _active={{ background: "green.900" }} rightIcon={<AiOutlineSearch />} onClick={fetchAds}>
                                 Search Items
                             </Button>
                         </div>
                     </form>
                 </div>
-                {loading ?
-                    <div className='bg-blue-400 h-[49vh] overflow-hidden'>
-                        <ItemsLoading />
-                    </div> : <>
-                        {ads.length ? <><h1 className="text-white font-bold text-3xl pl-4 mt-10">Fresh recommendations</h1>
-                            <div className='h-auto  overflow-y-auto flex flex-wrap gap-1 justify-around items-center'>
-                                {/* <h1 className='h-12'>hello</h1> */}
-                                {ads.map((obj) => (
-                                    <Box onClick={() => navigate(`/item/${obj._id}`)} cursor='pointer' to="/me" minW='sm' maxW={'sm'} mt={12} bg={"gray.700"} color={"gray.300"} borderWidth='1px' borderColor={'gray.400'} borderRadius='lg' overflow='hidden'>
-                                        <Box h="250px" p={0} >
-                                            <Image src={obj.images[0].url} h='full' w="full" alt={"Ad.imageAlt"} />
+                <div className=''>
+                    {loading ?
+                        // <div className='bg-transparent flex justify-center items-center h-full overflow-hidden'>
+                        //     <ItemsLoading />  
+                        // </div>
+                        <>
+                            <h1 className="text-white font-bold text-3xl pl-4 mt-6">Fresh recommendations</h1>
+                            <div className='h-auto overflow-y-auto flex gap-6 my-6 flex-wrap justify-around items-center'>
+                                {Array(3).fill(" ").map((obj, i) => (
+                                    <Box key={i} boxShadow='lg' minW='sm' maxW={'sm'} bg={"gray.700"} color={"gray.300"} borderWidth='1px' borderColor={'gray.400'} borderRadius='lg' overflow='hidden'>
+                                        <Box h="200px" w='full'>
+                                            <SkeletonText noOfLines={1} skeletonHeight='200' />
                                         </Box>
 
                                         <Box p='2'>
                                             <Box
                                                 mt='1'
-                                                fontWeight='bold'
-                                                fontSize={'xl'}
-                                                color="white"
                                             >
-                                                {obj.name}
+                                                <SkeletonText w="50%" noOfLines={1} spacing='4' skeletonHeight='3' />
                                             </Box>
                                             <Box w="full">
-                                                {obj.description.slice(0, 40)}{obj.description.length > 40 ? "..." : ""}
+                                                <SkeletonText mt='2' noOfLines={1} spacing='4' skeletonHeight='2' />
                                             </Box>
-                                            <Box display={"flex"} justifyContent={"space-between"} mt='1' color="gray.100">
-                                                <Box fontSize={"large"} fontWeight="bold">
-                                                    ₹ {obj.price}
+                                            <Box display={"flex"} mt='2' justifyContent={"space-between"} justifyItems='center' color="gray.100">
+                                                <Box fontSize={"large"} w="30%" fontWeight="bold">
+                                                    <SkeletonText noOfLines={1} spacing='4' skeletonHeight='3' />
                                                 </Box>
-                                                <Box>
-                                                    {obj.address.city} | {obj.address.state}
+                                                <Box w="40%">
+                                                    <SkeletonText noOfLines={1} spacing='4' skeletonHeight='2' />
                                                 </Box>
                                             </Box>
                                         </Box>
                                     </Box>
                                 ))}
                             </div>
-                            <div className={`flex justify-center my-12 `}>
-                                <div className={`${hideLoadButton ? "hidden" : "flex"}`}>
-                                    <Button variant="solid" mx='auto' onClick={() => fetchAds(true)} colorSchema="blue" >Load More</Button>
+                        </>
+                        : <>
+                            {ads.length ? <><h1 className="text-white font-bold text-3xl pl-4 mt-6">Fresh recommendations</h1>
+                                <div className='h-auto  overflow-y-auto flex flex-wrap gap-6 my-6 justify-around items-center'>
+                                    {/* <h1 className='h-12'>hello</h1> */}
+                                    {ads.map((ad) => (
+                                        <Box onClick={() => navigate(`/item/${ad._id}`)} cursor='pointer' to="/me" minW='sm' maxW={'sm'} bg={"gray.700"} color={"gray.300"} borderWidth='1px' borderColor={'gray.400'} borderRadius='lg' overflow='hidden'>
+                                            <Box h="250px" p={0} >
+                                                <Image src={ad.images[0].url} h='full' w="full" alt={"Ad.imageAlt"} />
+                                            </Box>
+
+                                            <Box p='2'>
+                                                <Box
+                                                    mt='1'
+                                                    fontWeight='bold'
+                                                    fontSize={'xl'}
+                                                    color="white"
+                                                >
+                                                    {ad.name.slice(0, 30)}{ad.name.length > 30 ? "..." : ""}
+                                                </Box>
+                                                <Box w="full">
+                                                    {ad.description.slice(0, 40)}{ad.description.length > 40 ? "..." : ""}
+                                                </Box>
+                                                <Box display={"flex"} justifyContent={"space-between"} mt='1' color="gray.100">
+                                                    <Box fontSize={"large"} fontWeight="bold">
+                                                        ₹ {ad.price}
+                                                    </Box>
+                                                    <Box>
+                                                        {ad.createdAt.slice(8, 10) + "/" + ad.createdAt.slice(5, 7) + "/" + ad.createdAt.slice(0, 4)}
+                                                    </Box>
+                                                </Box>
+                                            </Box>
+                                        </Box>
+                                    ))}
                                 </div>
-                            </div></> : <h1 className='text-2xl text-white'>No items Found</h1>
-                        }
-                    </>
-                }
+                                <div className={`${hideLoadButton ? "hidden" : "flex"} justify-center my-12 `}>
+                                    <div className="">
+                                        <Button variant="solid" mx='auto' onClick={() => fetchAds(true)} colorSchema="blue" >Load More</Button>
+                                    </div>
+                                </div></> : <div className="text-2xl sm:text-3xl font-bold h-full w-full flex items-center justify-center text-white capitalize">Items not found</div>
+                            }
+                        </>
+                    }
 
 
+                </div>
             </div>
         </>
     )

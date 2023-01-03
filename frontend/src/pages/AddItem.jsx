@@ -41,11 +41,9 @@ function AddItem() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     }
     const removeImg = () => {
-        // if (allImg.length) {
         setFile(null);
         setAllImg(allImg.filter((i) => (i !== allImg[allImg.length - 1])));
         setFiles(files.filter((i) => (i !== files[files.length - 1])));
-        // }
     }
     useEffect(() => {
         let fileReader, isCancel = false;
@@ -81,6 +79,7 @@ function AddItem() {
     const handleCourse = (e) => {
         setCourse(e.target.value);
         courseSem(e.target.value);
+        handleFormData(e);
     }
     const courseSem = (sem) => {
         switch (sem) {
@@ -116,7 +115,9 @@ function AddItem() {
     }
     const handleSubmit = async (e) => {
         setButtonLoading(true);
-        if (!formData || !formData.name || !formData.description || !formData.course || !formData.semester || !formData.price || !formData.city || !formData.state) {
+
+        console.log(formData);
+        if (!formData || !formData.name || !formData.description || !formData.course || !formData.price || !formData.state) {
             toast({
                 title: "Please Fill all the Feilds",
                 status: "warning",
@@ -150,7 +151,7 @@ function AddItem() {
         }
         formData.images = images;
         console.log(formData);
-        setButtonLoading(false);
+        setButtonLoading(true);
         try {
             const config = {
                 headers: {
@@ -159,9 +160,9 @@ function AddItem() {
             };
             const { data } = await axios.post('/api/adCard/new', formData);
             toast({
-                title: `${data.message}`,
+                title: `Item added successfully your item is under verification`, // data.message
                 status: "success",
-                duration: 3000,
+                duration: 5000,
                 isClosable: true,
                 position: "bottom",
             });
@@ -182,43 +183,43 @@ function AddItem() {
     }
 
     const TextH1 = ({ heading }) => {
-        return <h1 className="te text-4xl text-slate-700 font-semibold flex justify-center"> {heading}</h1>
+        return <h1 className="te text-4xl text-white font-semibold flex justify-center"> {heading}</h1>
     }
     const TextH2 = ({ heading }) => {
-        return <h1 className="my-3 text-xl font-semibold text-slate-700"> {heading}</h1>
+        return <h1 className="my-3 text-gray-300 text-xl font-semibold"> {heading}</h1>
     }
     return (
         <>
             <MetaData title={"Post Ad | College Bazaar"} />
             <Navbar active={"Sell Item"} />
-            <div className="bg-gray-600 h-auto overflow-auto">
-                <Container maxW="4xl" centerContent>
+            <div className=" h-auto overflow-auto bg-gray-600">
+                <Container maxW="4xl" my={6} centerContent>
                     <Box
                         d="flex"
                         justifyContent="center"
+                        bg="gray.700"
                         p={3}
-                        bg="white"
                         w="100%"
-                        m="40px 0 15px 0"
+                        // m="40px 0 15px 0"
+                        mb={4}
                         borderRadius="lg"
-                        borderWidth="1px"
+                    // borderWidth="1px"
                     >
                         <TextH1 heading={"POST YOUR AD"} />
                     </Box>
                     <Box
                         d="flex"
                         justifyContent="center"
-                        p={4}
-                        bg="gray.100"
+                        color={'gray.100'}
                         w="100%"
-                        mb={10}
-                        borderRadius="lg"
-                        borderWidth="1px">
+                    // borderRadius="lg"
+                    // borderWidth="1px"
+                    >
                         <Box
                             d="flex"
                             justifyContent="center"
                             p={3}
-                            bg="white"
+                            bg="gray.700"
                             borderRadius="md"
                             w="100%"
                             mb={1}
@@ -232,6 +233,8 @@ function AddItem() {
                                         type="text"
                                         value={formData && formData.name}
                                         onChange={handleFormData}
+                                        bg={"gray.600"}
+                                        border='none'
                                     />
                                     <Text fontSize="xs" className='font-thin'>Mention the key features of your item (e.g. book name, brand, type)  </Text>
                                 </FormControl>
@@ -241,46 +244,60 @@ function AddItem() {
                                         name="description"
                                         value={formData && formData.description}
                                         onChange={handleFormData}
+                                        type="text"
+                                        bg='gray.600'
+                                        border='none'
                                     />
                                     <Text fontSize="xs" className='font-thin'>Include condition, features and reason for selling</Text>
                                 </FormControl>
                                 <FormControl id="category">
                                     <FormLabel>Category</FormLabel>
-                                    <Select name="category" placeholder='  ' Selected value={formData && formData.category}
-                                        onChange={handleFormData}>
+                                    <select id="category"
+                                        name="category"
+                                        value={formData && formData.category}
+                                        onChange={handleFormData}
+                                        class="bg-gray-500 border border-gray-300 text-gray-900 text-md rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-slate-600 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                        <option value="">Category</option>
                                         <option value="Akash">Akash</option>
                                         <option value="Books">Book</option>
                                         <option value="ED">Engineering Drawing</option>
                                         <option value="Electornics">Electornics</option>
-                                    </Select>
+                                    </select>
                                 </FormControl>
                             </VStack>
                         </Box>
-                        <Divider />
                         <Box
                             d="flex"
                             justifyContent="center"
                             p={3}
-                            bg="white"
+                            bg="gray.700"
                             borderRadius="md"
                             w="100%"
                             mb={1}
                         >
                             <TextH2 heading={"Course Details"} />
                             <VStack spacing="10px">
-                                <FormControl id="course" isRequired onChange={handleCourse}>
+                                <FormControl id="course" isRequired>
                                     <FormLabel>Course</FormLabel>
-                                    <Select name="course" placeholder='  ' Selected value={formData && formData.course}
-                                        onChange={handleFormData}>
+                                    <select id="course"
+                                        name="course"
+                                        value={formData && formData.course}
+                                        onChange={handleCourse}
+                                        class="bg-gray-500 text-md border border-gray-300 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-slate-600 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                        <option value="">Course</option>
                                         <option value="B.Tech" >B.Tech</option>
                                         <option value="BBA">BBA</option>
                                         <option value="MBA">MBA</option>
-                                    </Select>
+                                    </select>
                                 </FormControl>
-                                <FormControl id="semester" isRequired onChange={handleCourse}>
+                                <FormControl id="semester">
                                     <FormLabel>Semester</FormLabel>
-                                    <Select name="semester" placeholder='  ' Selected value={formData && formData.semester}
-                                        onChange={handleFormData}>
+                                    <select id="semester"
+                                        name="semester"
+                                        value={formData && formData.semester}
+                                        onChange={handleFormData}
+                                        class="bg-gray-500 text-md border border-gray-300 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-slate-600 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                        <option value="">Semester</option>
                                         <option value="first" className={sem >= 1 ? "flex m-3" : "hidden"}>I</option>
                                         <option value="second" className={sem >= 2 ? "flex m-3" : "hidden"}>II</option>
                                         <option value="third" className={sem >= 3 ? "flex m-3" : "hidden"}>III</option>
@@ -289,16 +306,15 @@ function AddItem() {
                                         <option value="sixth" className={sem >= 6 ? "flex" : "hidden"}>VI</option>
                                         <option value="seventh" className={sem >= 7 ? "flex" : "hidden"}>VII</option>
                                         <option value="eighth" className={sem >= 8 ? "flex" : "hidden"}>VIII</option>
-                                    </Select>
+                                    </select>
                                 </FormControl>
                             </VStack>
                         </Box>
-                        <Divider />
                         <Box
                             d="flex"
                             justifyContent="center"
                             p={3}
-                            bg="white"
+                            bg="gray.700"
                             borderRadius="md"
                             w="100%"
                             mb={1}>
@@ -306,8 +322,8 @@ function AddItem() {
                             <div className='flex flex-wrap space-x-2 p-2 space-y-1'>
                                 <Input className='hidden' type="file" id="fileInput" accept='image/*' name="fileInput" ref={fileUpload} onChange={handleChange} />
                                 {Array(6).fill(' ').map((_, i) => (
-                                    <button type="button" key={i} onClick={!allImg[i] && handleUpload} className={`border-2 ${allImg[i] ? "opacity-100" : "opacity-40"} focus:opacity-100 border-gray-600 h-24 w-24 flex justify-center items-center `}>
-                                        {allImg[i] ? <img src={allImg[i]} className="h-[100%] w-[100%]" /> : <svg width="36px" height="36px" viewBox="0 0 1024 1024" data-aut-id="icon" class fill-rule="evenodd">
+                                    <button type="button" key={i} onClick={!allImg[i] && handleUpload} className={`border-2 ${allImg[i] ? "opacity-100" : "opacity-40"} focus:opacity-100 border-white h-24 w-24 flex justify-center items-center `}>
+                                        {allImg[i] ? <img src={allImg[i]} className="h-[100%] w-[100%]" /> : <svg width="36px" height="36px" fill='white' viewBox="0 0 1024 1024" data-aut-id="icon" class fill-rule="evenodd">
                                             <path d="M841.099 667.008v78.080h77.568v77.653h-77.568v77.141h-77.568v-77.184h-77.611v-77.611h77.611v-78.080h77.568zM617.515 124.16l38.784 116.437h165.973l38.827 38.827v271.659l-38.827 38.357-38.741-38.4v-232.832h-183.125l-38.784-116.48h-176.853l-38.784 116.48h-183.083v426.923h426.667l38.784 38.357-38.784 39.253h-465.493l-38.741-38.869v-504.491l38.784-38.827h165.973l38.827-116.437h288.597zM473.216 318.208c106.837 0 193.92 86.955 193.92 194.048 0 106.923-87.040 194.091-193.92 194.091s-193.963-87.168-193.963-194.091c0-107.093 87.083-194.048 193.963-194.048zM473.216 395.861c-64.213 0-116.352 52.181-116.352 116.395 0 64.256 52.139 116.437 116.352 116.437 64.171 0 116.352-52.181 116.352-116.437 0-64.213-52.181-116.437-116.352-116.437z"></path>
                                         </svg>}
                                     </button>
@@ -321,7 +337,7 @@ function AddItem() {
                             d="flex"
                             justifyContent="center"
                             p={3}
-                            bg="white"
+                            bg="gray.700"
                             borderRadius="md"
                             w="100%"
                             mb={1}
@@ -334,16 +350,16 @@ function AddItem() {
                                     type="number"
                                     value={formData && formData.price}
                                     onChange={handleFormData}
+                                    border='none'
+                                    bg='gray.600'
                                 />
                             </FormControl>
                         </Box>
-                        <Divider />
-                        <Divider />
                         <Box
                             d="flex"
                             justifyContent="center"
                             p={3}
-                            bg="white"
+                            bg="gray.700"
                             borderRadius="md"
                             w="100%"
                             mb={1}
@@ -351,12 +367,22 @@ function AddItem() {
                             <TextH2 heading={"CONFIRM YOUR LOCATION"} />
                             <FormControl id="state" isRequired>
                                 <FormLabel>State</FormLabel>
-                                <Select name="state" placeholder='  ' Selected value={formData && formData.state}
+                                {/* <Select name="state" placeholder='  ' Selected value={formData && formData.state}
                                     onChange={handleFormData}>
                                     <option value="delhi" >Delhi</option>
                                     <option value="haryana">Haryana</option>
                                     <option value="up">Up</option>
-                                </Select>
+                                </Select> */}
+                                <select id="state"
+                                    name="state"
+                                    value={formData && formData.state}
+                                    onChange={handleFormData}
+                                    class="bg-gray-500 text-md border border-gray-300 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-slate-600 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                    <option value="" >State</option>
+                                    <option value="delhi" >Delhi</option>
+                                    <option value="haryana">Haryana</option>
+                                    <option value="up">Up</option>
+                                </select>
                             </FormControl>
                             <FormControl id="city">
                                 <FormLabel>City</FormLabel>
@@ -365,10 +391,11 @@ function AddItem() {
                                     type="text"
                                     value={formData && formData.city}
                                     onChange={handleFormData}
+                                    border='none'
+                                    bg='gray.600'
                                 />
                             </FormControl>
                         </Box>
-                        <Divider />
                         {/* <div className='p-2 flex flex-col'> */}
                         <Button variant="solid" w={"100%"} colorScheme="green" isLoading={buttonLoading} type="submit" onClick={handleSubmit} loadingText="It may take few seconds">Post Now</Button>
                         {/* </div> */}

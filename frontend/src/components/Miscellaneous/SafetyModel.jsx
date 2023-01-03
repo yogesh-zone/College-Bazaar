@@ -38,7 +38,7 @@ const SafetyModel = ({ flag }) => {
             {!flag && <MdReportProblem onClick={onOpen} />}
             <Modal size='lg' onClose={onClose} isOpen={isOpen} isCentered>
                 <ModalOverlay />
-                <ModalContent h="410px" bg='gray.700'
+                <ModalContent h='auto' bg='gray.700'
                     color='white'>
                     <ModalHeader
                         fontSize="80px"

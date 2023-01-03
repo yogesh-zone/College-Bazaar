@@ -2,7 +2,7 @@ import React from 'react'
 import Helmet from "react-helmet";
 import { Avatar, Menu, MenuButton, MenuDivider, MenuItem, MenuList, MenuOptionGroup, Toast, useToast } from '@chakra-ui/react'
 import { FiLogOut, FiSettings } from 'react-icons/fi'
-import { MdOutlineAccountCircle, MdOutlineSell } from 'react-icons/md'
+import { MdOutlineAccountCircle, MdOutlineSell, MdOutlineSpaceDashboard } from 'react-icons/md'
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
@@ -47,6 +47,11 @@ export const AvatarIcon = () => {
                 <MenuList color={'black'}>
                     <MenuOptionGroup defaultValue='asc' title={user.name} type='radio'>
                         <MenuDivider />
+                        {user.role === 1 &&
+                            <MenuItem onClick={() => navigate('/dashboard')} icon={<MdOutlineSpaceDashboard className='text-lg' />}>
+                                DashBoard
+                            </MenuItem>
+                        }
                         <MenuItem onClick={() => navigate('/me')} icon={<MdOutlineAccountCircle className='text-lg' />}>
                             My Account
                         </MenuItem>
@@ -99,5 +104,17 @@ export const ButtonGhost = ({ path, name }) => {
 
         </>
     );
+};
+
+
+export const lottieOptions = (animationData) => {
+    return {
+        loop: true,
+        autoplay: true,
+        animationData: animationData,
+        rendererSettings: {
+            preserveAspectRatio: "xMidYMid slice",
+        },
+    };
 };
 

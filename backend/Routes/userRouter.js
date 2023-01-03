@@ -22,7 +22,7 @@ router.get("/", auth, userCtrl.loadUser);
 
 router.get("/information/:id", auth, adminAuth, userCtrl.getUserInfor);
 
-router.get("/all_information", auth, adminAuth, userCtrl.getUsersAllInfor);
+router.post("/all_information", auth, adminAuth, userCtrl.getUsersAllInfor);
 
 router.get("/logout", userCtrl.logout);
 
