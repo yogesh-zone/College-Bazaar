@@ -9,12 +9,12 @@ const messageSchema = new mongoose.Schema(
 
     sender: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      ref: "User",
     },
 
     chat: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "chat",
+      ref: "Chat",
     },
 
     read: {

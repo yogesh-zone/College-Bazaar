@@ -1,53 +1,59 @@
 const mongoose = require("mongoose");
 
-const adSchema = mongoose.Schema({
-  name: {
-    type: String,
-    require: [true, "Please fill name of item!"],
-    trime: true,
-  },
-
-  description: {
-    type: String,
-    trime: true,
-  },
-
-  image: [
-    {
-      url: {
-        type: String,
-        require: [true, "Please upload your item's image!"],
-      },
-      public_id: {
-        type: String,
-        require: [true, "Please upload your item's image!"],
-      },
+const adSchema = mongoose.Schema(
+  {
+    name: {
+      type: String,
+      require: [true, "Please fill in name"],
+      trime: true,
     },
-  ],
 
-  Category: {
-    type: String,
-    default: "All",
-  },
-
-  semester: {
-    type: String,
-    require: [true, "Please fill in semester input!"],
-  },
-
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-  },
-  address: {
-    city: {
+    description: {
       type: String,
       trime: true,
     },
-    state: {
+
+    Category: {
       type: String,
+      default: "All",
+    },
+
+    course: {
+      type: String,
+      require: [true, "Please select a course"],
+    },
+
+    semester: {
+      type: String,
+      require: [true, "Please fill in semester input!"],
+    },
+
+    images: [],
+
+    price: {
+      type: Number,
+      require: [true, "Please set a price"],
+    },
+    verified: {
+      type: Boolean,
+      default: false,
+    },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+
+    address: {
+      city: {
+        type: String,
+        trime: true,
+      },
+      state: {
+        type: String,
+      },
     },
   },
-});
+  { timestamps: true }
+);
 
 module.exports = mongoose.model("Ad", adSchema);

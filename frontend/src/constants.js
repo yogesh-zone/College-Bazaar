@@ -1,0 +1,42 @@
+// user login constants
+export const LOGIN_REQUEST = "LOGIN_REQUEST";
+export const LOGIN_SUCCESS = "LOGIN_SUCCESS";
+export const LOGIN_FAILS = "LOGIN_FAILS";
+
+// user register constants
+export const REGISTER_USER_REQUEST = "REGISTER_USER_REQUEST";
+export const REGISTER_USER_SUCCESS = "REGISTER_USER_SUCCESS";
+export const REGISTER_USER_FAILS = "REGISTER_USER_FAILS";
+
+// load user if jwt token exist
+export const LOAD_USER_REQUEST = "LOAD_USER_REQUEST";
+export const LOAD_USER_SUCCESS = "LOAD_USER_SUCCESS";
+export const LOAD_USER_FAILS = "LOAD_USER_FAILS";
+
+// logout user
+export const LOGOUT_USER_REQUEST = "LOGOUT_USER_REQUEST";
+export const LOGOUT_USER_SUCCESS = "LOGOUT_USER_SUCCESS";
+export const LOGOUT_USER_FAILS = "LOGOUT_USER_FAILS";
+
+// user UPDATE constants
+export const UPDATE_USER_REQUEST = "UPDATE_USER_REQUEST";
+export const UPDATE_USER_SUCCESS = "UPDATE_USER_SUCCESS";
+export const UPDATE_USER_FAILS = "UPDATE_USER_FAILS";
+
+// user UPDATE constants
+export const UPDATE_PASSWORD_REQUEST = "UPDATE_PASSWORD_REQUEST";
+export const UPDATE_PASSWORD_SUCCESS = "UPDATE_PASSWORD_SUCCESS";
+export const UPDATE_PASSWORD_FAILS = "UPDATE_PASSWORD_FAILS";
+
+// fetching selected chats
+export const SELECTED_CHAT_REQUEST = "SELECTED_CHAT_REQUEST";
+export const SELECTED_CHAT_SUCCESS = "SELECTED_CHAT_SUCCESS";
+export const SELECTED_CHAT_FAILS = "SELECTED_CHAT_FAILS";
+
+// fetching all chats
+export const ALL_CHATS_REQUEST = "ALL_CHATS_REQUEST";
+export const ALL_CHATS_SUCCESS = "ALL_CHATS_SUCCESS";
+export const ALL_CHATS_FAILS = "ALL_CHATS_FAILS";
+
+// clear all errors
+export const CLEAR_ERROR = "CLEAR_ERROR";

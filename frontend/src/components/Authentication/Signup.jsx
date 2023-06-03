@@ -1,0 +1,171 @@
+import { Button } from "@chakra-ui/button";
+import { Checkbox } from "@chakra-ui/react";
+import { FormControl, FormLabel } from "@chakra-ui/form-control";
+import { Input, InputGroup, InputRightElement } from "@chakra-ui/input";
+import { VStack } from "@chakra-ui/layout";
+import { useToast } from "@chakra-ui/toast";
+import axios from "axios";
+import { useState } from "react";
+import { FcGoogle } from "react-icons/fc";
+import { useNavigate } from "react-router";
+
+const Signup = () => {
+    const [show, setShow] = useState(false);
+    const handleClick = () => setShow(!show);
+    const toast = useToast();
+    const navigator = useNavigate();
+
+    const [name, setName] = useState();
+    const [email, setEmail] = useState();
+    const [confirmpassword, setConfirmpassword] = useState();
+    const [password, setPassword] = useState();
+    const [phone, setPhone] = useState();
+    const [showPhone, setShowPhone] = useState(false);
+    const [loading, setLoading] = useState(false);
+
+    const submitHandler = async () => {
+        setLoading(true);
+        if (!name || !email || !password || !confirmpassword || !phone) {
+            toast({
+                title: "Please Fill all the Feilds",
+                status: "warning",
+                duration: 3000,
+                isClosable: true,
+                position: "bottom",
+            });
+            setLoading(false);
+            return;
+        }
+        if (password !== confirmpassword) {
+            toast({
+                title: "Passwords Do Not Match",
+                status: "warning",
+                duration: 3000,
+                isClosable: true,
+                position: "bottom",
+            });
+            setLoading(false);
+            return;
+        }
+        console.log(name, email, password, phone, showPhone);
+        try {
+            // const config = {
+            //     headers: {
+            //         "Content-type": "application/json",
+            //     },
+            // };
+            const { data } = await axios.post(
+                "/api/user/register",
+                {
+                    name,
+                    email,
+                    password,
+                    phone,
+                    showPhone
+                },
+            );
+            toast({
+                title: data.message,
+                status: "success",
+                duration: 5000,
+                isClosable: true,
+                position: "bottom",
+            });
+            // localStorage.setItem("userInfo", JSON.stringify(data));
+            setLoading(false);
+            navigator('/user/activate/:activation_token');
+        } catch (error) {
+            toast({
+                title: "Error Occured!",
+                description: error.response.data.error,
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+                position: "bottom",
+            });
+            setLoading(false);
+        }
+    };
+
+
+    return (
+        <VStack spacing="5px">
+            {/* <Button
+                variant="solid"
+                colorScheme="gray"
+                color='black'
+                width="100%"
+                display="flex"
+                justifyContent="start"
+            >
+                <FcGoogle />
+                <p className="ml- mx-auto">Google</p>
+            </Button>
+            <div>
+                or
+            </div> */}
+            <FormControl id="first-name" isRequired>
+                <FormLabel>Name</FormLabel>
+                <Input
+                    placeholder="Enter Your Name"
+                    onChange={(e) => setName(e.target.value)}
+                />
+            </FormControl>
+            <FormControl id="email" isRequired>
+                <FormLabel>Email Address</FormLabel>
+                <Input
+                    type="email"
+                    placeholder="Enter Your Email Address"
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+            </FormControl>
+            <FormControl id="password" isRequired>
+                <FormLabel>Password</FormLabel>
+                <InputGroup size="md">
+                    <Input
+                        type={show ? "text" : "password"}
+                        placeholder="Enter Password"
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <InputRightElement width="4.5rem">
+                        <Button colorScheme='none' h="1.75rem" size="sm" onClick={handleClick}>
+                            {show ? "Hide" : "Show"}
+                        </Button>
+                    </InputRightElement>
+                </InputGroup>
+            </FormControl>
+            <FormControl id="password" isRequired>
+                <FormLabel>Confirm Password</FormLabel>
+                <InputGroup size="md">
+                    <Input
+                        type='text'
+                        placeholder="Confirm password"
+                        onChange={(e) => setConfirmpassword(e.target.value)}
+                    />
+                </InputGroup>
+            </FormControl>
+            <FormControl id="phone" isRequired>
+                <FormLabel>Phone</FormLabel>
+                <Input
+                    placeholder="Enter Your Mobile no."
+                    type="number"
+                    onChange={(e) => setPhone(e.target.value)}
+                />
+                <Checkbox value={showPhone} mt={1} borderColor="white" colorScheme='green' onChange={(e) => setShowPhone(!showPhone)}>
+                    Show phone number to other users
+                </Checkbox>
+            </FormControl>
+            <Button
+                colorScheme="blue"
+                width="100%"
+                style={{ marginTop: 15 }}
+                onClick={submitHandler}
+                isLoading={loading}
+            >
+                Sign Up
+            </Button>
+        </VStack>
+    );
+};
+
+export default Signup;

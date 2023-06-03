@@ -1,7 +1,5 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
 
 const userSchema = mongoose.Schema(
   {
@@ -10,7 +8,7 @@ const userSchema = mongoose.Schema(
       require: [true, "Please enter your name!"],
       trime: true,
       minlength: [2, "Name must be at least 2 character"],
-      maxlength: [15, "Name cannot exceed 15 characters"],
+      maxlength: [25, "Name cannot exceed 15 characters"],
     },
 
     email: {
@@ -29,7 +27,6 @@ const userSchema = mongoose.Schema(
     role: {
       type: Number,
       default: 0, // 0 => user ,  1 => admin
-      select: false,
     },
 
     avatar: {
@@ -44,8 +41,8 @@ const userSchema = mongoose.Schema(
       },
     },
     phone: {
-      type: String,
-      default: undefined,
+      showPhone: { type: Boolean, default: false },
+      phone: { type: String, default: undefined },
     },
 
     resetPasswordToken: {

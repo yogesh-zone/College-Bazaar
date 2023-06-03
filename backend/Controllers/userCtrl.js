@@ -1,60 +1,59 @@
 const User = require("../DBmodels/userModel");
+const Ad = require("../DBmodels/adModel");
+const Chat = require("../DBmodels/chatModel");
+const Messages = require("../DBmodels/messageModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const sendMail = require("../Utils/sendMail");
 const cloudinary = require("../Utils/cloudinary");
 const sendToken = require("../Utils/jwtToke");
+const ErrorHandler = require("../Utils/errorHandler");
 
 const userCtrl = {
-  register: async (req, res) => {
+  register: async (req, res, next) => {
     try {
-      const { name, email, password, phone } = req.body;
+      console.log(req.body);
+      const { name, email, password, phone, showPhone } = req.body;
 
       if (!name || !email || !password) {
-        return res.status(400).json({ msg: "Please fill in all fields." });
+        return next(new ErrorHandler("Please fill in all fields.", 400));
       }
 
       if (!validateEmail(email)) {
-        return res.status(400).json({ msg: "Invalid email." });
+        return next(new ErrorHandler("Invalid email.", 400));
       }
       if (phone && !validatePhoneNumber(phone)) {
-        return res.status(400).json({ msg: "Invalid mobile number." });
+        return next(new ErrorHandler("Invalid mobile number.", 400));
       }
-      const user = await User.findOne({ email });
+      const user = await User.findOne({
+        email: { $regex: new RegExp(email, "i") },
+      });
       if (user)
-        return res.status(400).json({ msg: "This email already exists." });
-
-      if (password.length < 6)
-        return res
-          .status(400)
-          .json({ msg: "Password must be at least 6 characters." });
+        return next(new ErrorHandler("This account already exist", 400));
 
       const passwordHash = await bcrypt.hash(password, 12);
       const newUser = {
         name,
         email,
         password: passwordHash,
-        phone,
+        phone: { showPhone, phone },
       };
 
-      // send a verification mail to user for verify email
       const activation_token = createActivationToken(newUser);
       const url = `${process.env.CLIENT_URL}/user/activate/${activation_token}`;
-
+      console.log(url, "\n\n");
       //send this url to email for verification
       const obj = { name, email, url, txt: "Verify your email address" };
-      sendMail(obj);
-
-      res.status(201).json({
-        msg: `Register Success! an activation link is send to ${email}`,
-        activation_token,
+      // sendMail(obj);
+      return res.status(201).json({
+        message: `An activation link is send to your email!`,
       });
-    } catch (err) {
-      return res.status(500).json({ msg: err.message });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
     }
   },
 
-  activateEmail: async (req, res) => {
+  activateEmail: async (req, res, next) => {
     try {
       const { activation_token } = req.params;
 
@@ -64,12 +63,14 @@ const userCtrl = {
         process.env.JWT_ACTIVATION_TOKEN_SECRET
       );
 
-      // console.log(user);
+      console.log("under route", user);
       const { name, email, password, phone } = user;
 
-      const check = await User.findOne({ email });
+      const check = await User.findOne({
+        email: { $regex: new RegExp(email, "i") },
+      });
       if (check) {
-        return res.status(400).json({ msg: "This email already exist." });
+        return next(new ErrorHandler("This email already exist.", 400));
       }
       const newUser = new User({
         name,
@@ -79,33 +80,49 @@ const userCtrl = {
       });
       await newUser.save();
       sendToken(newUser, 201, res, "Account has been activated!");
-    } catch (err) {
-      return res.status(500).json({ msg: err.message });
+      return;
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
     }
   },
 
-  login: async (req, res) => {
+  login: async (req, res, next) => {
     try {
       const { email, password } = req.body;
       if (!email || !password) {
-        return res.status(400).json({ msg: "Please fill in all fields." });
+        return next(new ErrorHandler("Please fill in all fields.", 400));
       }
-      const user = await User.findOne({ email }).select("+password");
+
+      const user = await User.findOne({
+        email: { $regex: new RegExp(email, "i") },
+      }).select("+password");
       if (!user) {
-        return res.status(400).json({ msg: "This email does not exist" });
+        return next(new ErrorHandler("Invalid email or password", 400));
       }
 
       const isPasswordMatched = await user.comparePassword(password);
       if (!isPasswordMatched) {
-        return res.status(400).json({ msg: "Password is incorrect." });
+        return next(new ErrorHandler("Password is incorrect.", 400));
       }
       // save cookies to browser
       sendToken(user, 200, res, "Login success.");
-    } catch (err) {
-      return res.status(500).json({ msg: err.message });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
     }
   },
 
+  // Get User Detail / load user
+  loadUser: async (req, res, next) => {
+    try {
+      const user = await User.findById(req.user.id);
+      if (!user) {
+        return next(new ErrorHandler("not logged In", 400));
+      }
+      res.json({ user: user });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
   // getAccessToken: async (req,res)=>{
   //     try {
 
@@ -127,12 +144,14 @@ const userCtrl = {
   //     }
   // },
 
-  forgotPassword: async (req, res) => {
+  forgotPassword: async (req, res, next) => {
     try {
       const { email } = req.body;
-      const user = await User.findOne({ email });
+      const user = await User.findOne({
+        email: { $regex: new RegExp(email, "i") },
+      });
       if (!user) {
-        return res.status(400).json({ msg: "This email does not exist." });
+        return next(new ErrorHandler("Invalid email.", 400));
       }
       // creacte access token and send it to mail
       const reset_token = createResetToken({ email });
@@ -142,13 +161,15 @@ const userCtrl = {
       user.resetPasswordExpire = Date.now() + 15 * 60 * 1000;
       await user.save();
       sendMail({ name, email, url, txt: "Reset your password" });
-      res.json({ msg: "Re-send the password, please check your email." });
-    } catch (err) {
-      return res.status(500).json({ msg: err.message });
+      res
+        .status(200)
+        .json({ message: "Reset link sent, please check your email." });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
     }
   },
 
-  resetPassword: async (req, res) => {
+  resetPassword: async (req, res, next) => {
     try {
       const { password } = req.body;
       const { reset_token } = req.params;
@@ -157,27 +178,27 @@ const userCtrl = {
         reset_token,
         process.env.JWT_RESET_TOKEN_SECRET
       );
-      console.log(password);
-      const user = await User.findOne({ email }).select("+password");
+      const user = await User.findOne({
+        email: { $regex: new RegExp(email, "i") },
+      }).select("+password");
       if (
         !user ||
         !user.resetPasswordExpire ||
         Date.now > user.resetPasswordExpire
       ) {
-        res.json({ msg: "Invalid link!" });
+        return next(new ErrorHandler("Invalid link!", 400));
       }
       user.password = passwordHash;
       user.resetPasswordExpire = undefined;
       user.resetPasswordToken = undefined;
-      console.log(user);
       await user.save();
       sendToken(user, 201, res, "Password successfully changed!");
-    } catch (err) {
-      res.json({ msg: err.message });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
     }
   },
 
-  updatePassword: async (req, res) => {
+  updatePassword: async (req, res, next) => {
     try {
       const { oldPassword, newPassword } = req.body;
       const user = await User.findById(req.user.id).select("+password");
@@ -185,127 +206,154 @@ const userCtrl = {
       const isMatch = await user.comparePassword(oldPassword);
 
       if (!isMatch) {
-        return res.status(400).json({ msg: "Old Password is incorrect." });
+        return next(new ErrorHandler("Old Password is incorrect.", 400));
       }
       passwordHash = await bcrypt.hash(newPassword, 12);
       user.password = passwordHash;
       await user.save();
 
       return res.status(201).json({ msg: "Password changed successfully!" });
-    } catch (err) {
-      res.json({ msg: err.message });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
     }
   },
 
-  getUserInfor: async (req, res) => {
+  getUserInfor: async (req, res, next) => {
     try {
       const user = await User.findById(req.params.id);
       if (!user) {
-        return res.status(400).json({ msg: "No user found!" });
+        next(new ErrorHandler("User not found.", 400));
       }
       res.json({ msg: user });
     } catch (error) {
-      return res.status(500).json({ msg: error.message });
+      return next(new ErrorHandler(error.message, 500));
     }
   },
 
-  getMyInfor: async (req, res) => {
-    try {
-      const user = await User.findById(req.user.id);
-      res.json({ msg: user });
-    } catch (error) {
-      return res.status(500).json({ msg: error.message });
-    }
-  },
+  // getMyInfor: async (req, res, next) => {
+  //   try {
+  //     const user = await User.findById(req.user.id);
+  //     if (!user) {
+  //       next(new ErrorHandler("Invalid user", 400));
+  //     }
+  //     res.json({ msg: user });
+  //   } catch (error) {
+  //     return res.status(500).json(error.message);
+  //   }
+  // },
 
-  getUsersAllInfor: async (req, res) => {
+  getUsersAllInfor: async (req, res, next) => {
     try {
-      const user = await User.find();
+      const { name } = req.body;
+      const user = await User.find({
+        ...{ name: { $regex: name, $options: "i" } },
+      });
+      if (user.length === 0) {
+        return next(new ErrorHandler("No user found", 400));
+      }
       res.json({ user });
     } catch (error) {
-      return res.status(500).json({ msg: error.message });
+      return next(new ErrorHandler(error.message, 500));
     }
   },
 
-  logout: async (req, res) => {
+  logout: async (req, res, next) => {
     try {
       res.clearCookie("jwtToken");
-      return res.status(200).json({ msg: "Logged out." });
-    } catch (err) {
-      return res.status(500).json({ msg: err.message });
+      return res.status(200).json({ message: "User Logged out." });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
     }
   },
 
-  updateUser: async (req, res) => {
+  // unseen code
+  updateUser: async (req, res, next) => {
     try {
       const { name, phone } = req.body;
-      if (phone && !validatePhoneNumber(phone)) {
-        return res.status(400).json({ msg: "Invalid phone number" });
+      console.log(phone);
+      if (phone.phone && !validatePhoneNumber(phone.phone)) {
+        console.log(phone.phone);
+        return next(new ErrorHandler("Invalid phone number", 400));
       }
-      await User.findOneAndUpdate({ _id: req.user.id }, req.body);
-      return res.json({ msg: "Update success!" });
-    } catch (err) {}
-  },
-
-  updateUserRole: async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { role } = req.body;
-      const user = await User.findById(id).select("+role");
-      if (!user) {
-        return res.status(400).json({ msg: "Invalid user" });
-      }
-      user.role = role;
-      user.save();
-      return res.json({ msg: "Update success!" });
-    } catch (err) {
-      return res.status(500).json({ msg: err.message });
-      return res.status(500).json({ msg: err.message });
+      const user = await User.findByIdAndUpdate(req.user.id, req.body, {
+        new: true,
+        runValidators: true,
+        useFindAndModify: false,
+      });
+      return res.json({ message: "Update success!", user });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 400));
     }
   },
 
-  deleteUser: async (req, res) => {
+  updateUserRole: async (req, res, next) => {
     try {
       const { id } = req.params;
-      const { role } = req.body;
+      const user = await User.findById(id).select("+role");
+      if (!user) {
+        return next(new ErrorHandler("Invalid User", 500));
+      }
+      user.role = user.role ? 0 : 1;
+      user.save();
+      return res.json({ message: "Update success!" });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
+    }
+  },
+
+  deleteUser: async (req, res, next) => {
+    try {
+      const { id } = req.params;
       const user = await User.findById(id);
       if (!user) {
-        return res.status(400).json({ msg: "Invalid user" });
+        return next(new ErrorHandler("Invalid User", 500));
       }
       const imgId = user.avatar.public_id;
       if (imgId) {
         await cloudinary.v2.uploader.destroy(imgId);
       }
+      let ads = await Ad.find({ user: user._id });
+      let chats = await Chat.find({
+        users: { $elemMatch: { $eq: user._id } },
+      });
+      for (i in ads) {
+        let ad = ads[i];
+        console.log("Item under Proccess", "\n\n\n");
+        for (j in ad.images) {
+          const imgId = ad.images[j].public_id;
+          await cloudinary.v2.uploader.destroy(imgId);
+        }
+        await ad.remove();
+        console.log("Item has been removed", "\n\n\n");
+      }
+      for (let i in chats) {
+        let chat = chats[i];
+        await Messages.deleteMany({ chat: chat._id });
+        await chat.remove();
+      }
       user.remove();
       return res.json({ msg: "delete success!" });
-    } catch (err) {
-      return res.status(500).json({ msg: err.message });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
     }
   },
 
-  uploadAvatar: async (req, res) => {
+  uploadAvatar: async (req, res, next) => {
     try {
+      console.log(req.body);
+      const { url, public_id } = req.body;
       const user = await User.findById(req.user.id);
       const imgId = user.avatar.public_id;
       if (imgId) {
         // destroy the photo on cloud
         await cloudinary.v2.uploader.destroy(imgId);
       }
-      const files = req.files;
-      const file = files.file;
-      const result = await cloudinary.v2.uploader.upload(file.tempFilePath, {
-        folder: "College Bazaar",
-        width: 150,
-        height: 150,
-        crop: "fill",
-      });
-
-      user.avatar.url = result.secure_url;
-      user.avatar.public_id = result.public_id;
+      user.avatar.url = url;
+      user.avatar.public_id = public_id;
       user.save();
-      return res.json({ msg: result });
-    } catch (err) {
-      return res.status(500).json({ msg: err.message });
+      return res.json({ sucess: true });
+    } catch (error) {
+      return next(new ErrorHandler(error.message, 500));
     }
   },
 };
@@ -318,7 +366,6 @@ const validateEmail = (email) => {
 
 function validatePhoneNumber(input_str) {
   var re = /^\(?(\d{3})\)?[- ]?(\d{3})[- ]?(\d{4})$/;
-
   return re.test(input_str);
 }
 
